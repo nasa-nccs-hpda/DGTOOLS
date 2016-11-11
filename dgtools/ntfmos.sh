@@ -97,8 +97,8 @@ if [ ! -z "$ntf_list" ] ; then
             echo "Running wv_correct for ${#missing[@]} subsections"
             echo
             #Note: wv_correct can't use more than 200% CPU, IO and memory bound
-            echo parallel -v --delay 1 -j $ncpu 'wv_correct --threads 2 {} {.}.xml {.}_corr.tif; setnodata.py {.}_corr.tif 0' ::: ${missing[@]}
-            time parallel -v --delay 1 -j $ncpu 'wv_correct --threads 2 {} {.}.xml {.}_corr.tif; setnodata.py {.}_corr.tif 0' ::: ${missing[@]}
+            echo parallel -v --delay 1 -j $ncpu 'wv_correct --threads 2 {} {.}.xml {.}_corr.tif; gdal_edit.py -a_nodata 0 {.}_corr.tif' ::: ${missing[@]}
+            time parallel -v --delay 1 -j $ncpu 'wv_correct --threads 2 {} {.}.xml {.}_corr.tif; gdal_edit.py -a_nodata 0 {.}_corr.tif' ::: ${missing[@]}
         fi
         #Now create symlinks for xml
         for ntf in ${missing[@]} ; do 
