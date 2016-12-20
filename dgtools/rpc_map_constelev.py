@@ -20,10 +20,10 @@ import subprocess
 import numpy as np
 from osgeo import gdal
 from lib import dglib
-from lib import geolib
-from lib import warplib
-from lib import iolib
-from lib import malib
+from pygeotools.lib import geolib
+from pygeotools.lib import warplib
+from pygeotools.lib import iolib
+from pygeotools.lib import malib
 
 #Input images
 img1 = sys.argv[1]
