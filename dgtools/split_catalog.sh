@@ -11,18 +11,46 @@ set -x
 cloud=75
 
 inshp=$1
-lyr=${inshp%.*}
+#lyr=${inshp%.*}
 #Note: if input is ESRI GDB, need to specify layer
 #lyr=dg_imagery_index_stereo_antarctica
 #US gdb
 #lyr=dg_archive_index_2016jul07_US_stereo
 #lyr=dg_archive_index_2016jul07_US_all
+#Global gdb
+#lyr=dg_imagery_index_stereo
+lyr=dg_imagery_index_all
 
-ogr2ogr -overwrite -sql "SELECT * from $lyr WHERE 'CLOUDCOVER' < $cloud" ${inshp%.*}_CC${cloud}.shp $inshp
-inshp=${inshp%.*}_CC${cloud}.shp
-lyr=${inshp%.*}
+ogr2ogr -overwrite -sql "SELECT * from $lyr WHERE 'CLOUDCOVER' < $cloud" ${inshp%.*}_${lyr}_CC${cloud}.shp $inshp
+#shp=${inshp%.*}_CC${cloud}.shp
+shp=${inshp%.*}_${lyr}_CC${cloud}.shp
+lyr=${shp%.*}
 
+#HMA
+proj='EPSG:4326'
 #proj='+proj=longlat +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +no_defs '
+wkt='POLYGON ((66 47, 106 47, 106 25, 66 25, 66 47))'
+
+shp=$inshp
+ogr2ogr -progress -overwrite -clipsrc "$wkt" ${shp%.*}_HMA.shp $shp
+
+#Nov 1
+#Late sept to Late dec
+
+shp=${shp%.*}_HMA.shp
+lyr=${shp%.*}
+#UTM Zone 44N
+#proj='EPSG:32644'
+#ogr2ogr -t_srs $proj -progress -overwrite ${shp%.*}_32644.shp $shp
+#shp=${shp%.*}_32644.shp 
+
+#Split into geocells and smaller targets
+#This should include WV3 images, 110x13km
+area_cutoff=1300
+ogr2ogr -overwrite -sql "SELECT * from $lyr WHERE 'sqkm' >= '$area_cutoff'" ${shp%.*}_geocell.shp $shp
+ogr2ogr -overwrite -sql "SELECT * from $lyr WHERE 'sqkm' < '$area_cutoff'" ${shp%.*}_smallarea.shp $shp
+
+exit
 
 #EPSG:3031
 proj='+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs '
@@ -42,6 +70,14 @@ ogr2ogr -progress -overwrite -clipsrc "$wkt" ${lyr}_Ant.shp $shp
 
 shp=${lyr%.*}_Ant.shp
 lyr=${shp%.*}
+
+t1='2001-06-01'
+t2='2008-05-31'
+ogr2ogr -overwrite -sql "SELECT * from $lyr WHERE 'ACQDATE' >= '$t1' AND 'ACQDATE' <= '$t2'" ${lyr}_${t1}_${t2}.shp $shp 
+
+t1='2008-06-01'
+t2='2009-05-31'
+ogr2ogr -overwrite -sql "SELECT * from $lyr WHERE 'ACQDATE' >= '$t1' AND 'ACQDATE' <= '$t2'" ${lyr}_${t1}_${t2}.shp $shp 
 
 t1='2009-06-01'
 t2='2010-05-31'
@@ -69,6 +105,10 @@ ogr2ogr -overwrite -sql "SELECT * from $lyr WHERE 'ACQDATE' >= '$t1' AND 'ACQDAT
 
 t1='2015-06-01'
 t2='2016-05-31'
+ogr2ogr -overwrite -sql "SELECT * from $lyr WHERE 'ACQDATE' >= '$t1' AND 'ACQDATE' <= '$t2'" ${lyr}_${t1}_${t2}.shp $shp 
+
+t1='2016-06-01'
+t2='2017-05-31'
 ogr2ogr -overwrite -sql "SELECT * from $lyr WHERE 'ACQDATE' >= '$t1' AND 'ACQDATE' <= '$t2'" ${lyr}_${t1}_${t2}.shp $shp 
 
 #Split north into years
