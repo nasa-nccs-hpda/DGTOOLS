@@ -220,9 +220,12 @@ def get_pair_intersection(p):
     geom2 = p['id2_dict']['geom']
     intersection = geolib.geom_intersection([geom1, geom2])
     p['intersection'] = intersection
+    #This recomputes for local orthographic - important for width/height calculations
+    intersection_local = geolib.geom2localortho(intersection)
     if intersection is not None:
-        intersection_area = intersection.GetArea()
-        int_w, int_h = geolib.geom_wh(intersection)
+        #Area calc shouldn't matter too much
+        intersection_area = intersection_local.GetArea()
+        int_w, int_h = geolib.geom_wh(intersection_local)
         #Comput width/height, scale to km
         p['int_w'] = float('%0.2f' % (int_w/1000.))
         p['int_h'] = float('%0.2f' % (int_h/1000.))
@@ -305,7 +308,7 @@ def exp_disp(vx, vy, dt, res=0.5):
     return x_px, y_px
 
 #min_area is in square km
-def get_validpairs(candidates, min_conv=5, max_conv=70, max_dt_days=1.0, min_area=500, min_area_perc=20, min_w=10, min_h=10, include_intrack=False, same_platform=False):
+def get_validpairs(candidates, min_conv=5, max_conv=70, max_dt_days=1.0, min_area=500, min_area_perc=20, min_w=10, min_h=10, max_cc=75, include_intrack=False, same_platform=False):
     max_dt = timedelta(days=max_dt_days)
     #candidates = [p for p in itertools.combinations(d_list, 2)]
     good = []
@@ -332,6 +335,8 @@ def get_validpairs(candidates, min_conv=5, max_conv=70, max_dt_days=1.0, min_are
             continue
         #if p['pairtype'] is 'intrack':
         #    continue
+        if p['id1_dict']['cloudcover'] >= max_cc or p['id2_dict']['cloudcover'] >= max_cc:
+            continue
         if not include_intrack:
             if p['id1_dict']['stereopair'] is not None or p['id2_dict']['stereopair'] is not None:
                 continue
@@ -352,6 +357,7 @@ def unique_ids(p_list, out_fn=None):
     for i in p_list:
         id_list.extend([i['id1_dict']['id'], i['id2_dict']['id']])
     outlist = list(set(id_list))
+    outlist.sort()
     print len(id_list)
     print len(outlist)
     if out_fn is None:

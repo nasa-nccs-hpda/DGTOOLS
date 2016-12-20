@@ -4,7 +4,7 @@
 
 import os
 import sys
-from lib import dglib
+from dgtools.lib import dglib
 
 #On lfe in mono dir
 #Generate list of cat id and time from mono delivery
@@ -33,11 +33,12 @@ c = dglib.get_candidates(t_list)
 #This is much faster, does initial filtering by dt and intersection
 c = dglib.get_candidates_dt(d_list, max_dt=max_dt)
 if len(c) > 1:
-    g = dglib.get_validpairs(c, min_conv=10, max_conv=70, max_dt_days=max_dt, min_area=40, min_area_perc=10, min_w=10, min_h=10, include_intrack=False, same_platform=False)
+    g = dglib.get_validpairs(c, min_conv=10, max_conv=70, max_dt_days=max_dt, min_area=40, min_area_perc=0, min_w=6, min_h=6, max_cc=75, include_intrack=False, same_platform=False)
     #out_fn = os.path.splitext(shp_fn)[0]+'_validpairs_time_2day_update'
     out_fn = os.path.splitext(shp_fn)[0]+'_validpairs'
     dglib.valid_txt(g, out_fn+'.csv')
     dglib.valid_shp(g, out_fn+'.shp')
+    dglib.unique_ids(g, out_fn+'_uniq_ids.txt')
 
 #Now copy files to nobackup and generate dir
 #outdir=
