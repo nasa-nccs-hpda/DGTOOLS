@@ -10,8 +10,9 @@
 
 import os
 import sys
-from lib import dglib
-import osr
+from osgeo import osr
+
+from dgtools.lib import dglib
 
 xml1 = sys.argv[1]
 xml2 = sys.argv[2]

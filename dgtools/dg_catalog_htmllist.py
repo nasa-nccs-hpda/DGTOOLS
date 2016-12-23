@@ -29,11 +29,11 @@ from PIL import Image
 from bs4 import BeautifulSoup
 from datetime import datetime
 
-import numpy
-from lib import iolib
-from lib import malib
-from lib import geolib
-from lib import warplib
+import numpy as np
+from pygeotools.lib import iolib
+from pygeotools.lib import malib
+from pygeotools.lib import geolib
+from pygeotools.lib import warplib
 
 #Depreciated method to trim margins to valid data using PIL
 def trim(im):
@@ -203,8 +203,8 @@ for n, item in enumerate(cat_list):
         #This attempts to find valid edges and only mask data outside contiguous area
         #Residual offsets between mask and actual valid data...hmmm 
         print "Loading into masked array"
-        a = numpy.array(im)
-        ma = numpy.ma.masked_equal(a, browseimg_ndv)
+        a = np.array(im)
+        ma = np.ma.masked_equal(a, browseimg_ndv)
         print "Masking margins and trimming to valid data"
         a_trim = malib.apply_edgemask(ma, trim=True).filled(out_ndv)
         im_trim = Image.fromarray(a_trim)

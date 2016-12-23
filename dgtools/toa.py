@@ -3,7 +3,7 @@
 import sys
 import os
 
-from lib import dglib
+from dgtools.lib import dglib
 
 xml_fn = sys.argv[1]
 band = sys.argv[2]

@@ -16,9 +16,9 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 
-from lib import dglib
-from lib import iolib
-from lib import malib
+from dgtools.lib import dglib
+from pygeotools.lib import iolib
+from pygeotools.lib import malib
 import error_analysis
 
 dirlist = sys.argv[1:]

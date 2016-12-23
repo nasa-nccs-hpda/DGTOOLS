@@ -7,7 +7,7 @@ import glob
 import numpy as np
 from osgeo import gdal
 
-from lib import geolib
+from pygeotools.lib import geolib
 
 #This takes output browse images from dg_catalog_htmllist.py
 #and creates subdir with ln to candidate stereo

@@ -17,9 +17,11 @@
 import os
 import sys
 import subprocess
+
 import numpy as np
 from osgeo import gdal
-from lib import dglib
+
+from dgtools.lib import dglib
 from pygeotools.lib import geolib
 from pygeotools.lib import warplib
 from pygeotools.lib import iolib

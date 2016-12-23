@@ -2,7 +2,7 @@
 
 import sys
 
-from lib import dglib
+from dgtools.lib import dglib
 
 dir = sys.argv[1]
 

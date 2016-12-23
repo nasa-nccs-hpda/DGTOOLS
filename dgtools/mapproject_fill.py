@@ -15,8 +15,8 @@ from multiprocessing import cpu_count
 
 from osgeo import gdal
 
-from lib import dglib
-from lib import geolib
+from dgtools.lib import dglib
+from pygeotools.lib import geolib
 
 #Input images
 img_fn = sys.argv[1]

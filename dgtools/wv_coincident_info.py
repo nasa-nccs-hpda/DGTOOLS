@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 import numpy as np
 import dateutil.parser
 
-from lib import dglib
+from dgtools.lib import dglib
 
 indir = sys.argv[1]
 

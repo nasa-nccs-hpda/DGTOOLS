@@ -6,7 +6,7 @@ import sys
 import matplotlib.colors
 import numpy as np
 
-from lib import iolib
+from pygeotools.lib import iolib
 
 #Sample data in /scr/pansharpen_test
 

@@ -14,8 +14,8 @@ import sys
 import numpy as np
 import osr
 
-from lib import dglib
-from lib import geolib
+from dgtools.lib import dglib
+from pygeotools.lib import geolib
 
 wgs_srs = geolib.wgs_srs
 write_shp = False

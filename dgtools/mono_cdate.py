@@ -4,8 +4,8 @@ import os
 import glob
 from datetime import datetime, timedelta
 
-from lib import dglib
-from lib import timelib
+from dgtools.lib import dglib
+from pygeotools.lib import timelib
 
 dir = sys.argv[1]
 
