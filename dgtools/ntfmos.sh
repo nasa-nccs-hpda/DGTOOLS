@@ -17,7 +17,8 @@ function gettag() {
 correct=true
 
 #Number of parallel jobs to run - limited by memory
-ncpu=4
+#Set as 4 to be safe, but should be able to do 6 on ivy
+ncpu=6
 
 #Output mosaic ndv
 ndv=0
@@ -33,9 +34,6 @@ cd $dir
 
 t_start=$(date +%s)
 
-ext=ntf
-#ext=tif
-
 ids=($(dg_get_ids.py .))
 
 #Check for existing r100 and generate list of ntf to process
@@ -50,22 +48,21 @@ for id in ${ids[@]}; do
     fi
 done
 
+supported_satid="WV01 WV02"
+
 if [ ! -z "$ntf_list" ] ; then
-    #Check to make sure correction is supported 
-    xml1=$(echo $ntf_list | awk '{print $1}' | awk -F'.' '{print $1 ".xml"}')
-    satid=$(gettag $xml1 'SATID')
-
-    if [ "$satid" != "WV01" ] && [ "$satid" != "WV02" ] ; then
-        echo "Input camera unsopported for wv_correct"
-        correct=false
-    fi
-
     if $correct ; then 
         #Check for missing corr files
         missing=()
         for ntf in $ntf_list ; do
             if [ ! -e ${ntf%.*}_corr.tif ] ; then
-                missing+=($ntf)
+                #Check to make sure correction is supported 
+                satid=$(gettag ${ntf%.*}.xml 'SATID')
+                if $(echo $supported_satid | grep -q $satid) ; then 
+                    missing+=($ntf)
+                else
+                    echo "Input camera unsupported for wv_correct: $ntf"
+                fi
             fi
         done
         if (( ${#missing[@]} != 0 )) ; then
@@ -78,7 +75,9 @@ if [ ! -z "$ntf_list" ] ; then
         fi
         #Now create symlinks for xml
         for ntf in ${missing[@]} ; do 
-            ln -sf ${ntf%.*}.xml ${ntf%.*}_corr.xml
+            if [ -e ${ntf%.*}_corr.tif ] ; then 
+                ln -sf ${ntf%.*}.xml ${ntf%.*}_corr.xml
+            fi
         done
     fi
             
@@ -96,8 +95,12 @@ if [ ! -z "$ntf_list" ] ; then
         if [ ! -e ${outprefix}.r100.tif ]; then
             if $correct ; then
                 ntf_list=$(ls *${id}*_corr.tif)
+                #If no corr.tif are found (shouldn't happen), revert to original ntf list for dg_mosaic
+                if [ -z "$ntf_list" ] ; then
+                    ntf_list=$(ls | grep -e "${id}" | grep -i P1BS | egrep 'ntf|tif' | grep -v 'corr')
+                fi
             else
-                ntf_list=$(ls *$id*.$ext)
+                ntf_list=$(ls | grep -e "${id}" | grep -i P1BS | egrep 'ntf|tif' | grep -v 'corr')
             fi
             a="dg_mosaic $mos_opt --output-prefix $outprefix $ntf_list"
             arg_list+=\ \""$a"\"
