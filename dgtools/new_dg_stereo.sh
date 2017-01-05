@@ -124,6 +124,9 @@ stereo_opt+=" --threads $NCPUS"
 sparse_disp_opt+=" --processes $((NCPUS - 1))"
 map_opt+=" --threads $NCPUS"
 
+#Should use this for validpairs formed from mono images with different illumination
+stereo_opt+=" --individually-normalize"
+
 #Sub-pixel refinement
 #1=parabola
 #2=bayesEM
@@ -169,7 +172,8 @@ max_lv=5
 stereo_opt+=" --corr-max-levels $max_lv"
 
 #Timeout for tile in seconds
-timeout=360
+#timeout=360
+timeout=480
 #timeout=600
 #timeout=1200
 stereo_opt+=" --corr-timeout $timeout"
@@ -206,7 +210,9 @@ if $pleiades ; then
     #rpcdem=$rpcdir/rainierlidar_8x_wgs84.tif
     #rpcdem=$rpcdir/NED_nw_10m_utm.tif
     #rpcdem=$rpcdir/NED_nw_10m_utm_WGS84.tif
-    rpcdem=$rpcdir/ned1/ned1_tiles_glac24k_115kmbuff.vrt
+    #rpcdem=$rpcdir/ned1/ned1_tiles_glac24k_115kmbuff.vrt
+    #rpcdem=$rpcdir/gulkana_wolverine_ArcticDEM/gulkana_wolverine_ArcticDEM_8m.vrt
+    rpcdem=$rpcdir/hma/srtm1/hma_srtm_gl1.vrt
 else
     rpcdir=/Volumes/insar5/dshean
     #rpcdem=$rpcdir/MtStHelens/NED_13/n47w122_n47w123_mos_32610.tif
@@ -260,6 +266,10 @@ echo
 #Input directory
 dir=$1
 cd $dir
+#Set up striping for outdir that will contain large files
+if $pleiades ; then
+    lfs setstripe -c 20 .
+fi
 
 echo "Current directory: " `pwd`
 echo
