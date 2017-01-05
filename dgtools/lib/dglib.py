@@ -536,7 +536,7 @@ def dir_pair_dict(dir):
 def pairname_ids(dir):
     return os.path.split(dir)[-1].split('_')[2:4]
 
-def dir_ids(dir, panonly=True):
+def dir_ids(dir, panonly=False):
     imglist = []
     if panonly:
         #This won't work with 103001003A146500_r100.tif
@@ -556,7 +556,7 @@ def dir_ids(dir, panonly=True):
 #This should only return a single ID, not a list
 def get_id(s):
     import re
-    idlist = re.findall('10[12345][0-9a-fA-F]+00', s)
+    idlist = re.findall('10[123456][0-9a-fA-F]+00', s)
     idlist2 = []
     if idlist:
         #Check to make sure we have correct string length - should do this with re, but quickfix
