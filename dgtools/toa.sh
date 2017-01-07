@@ -21,9 +21,14 @@ echo "Image: $img"
 res=30
 if [ ! -e ${img%.*}_${res}m.tif ] ; then
     echo "Generating lowres image: ${img%.*}_${res}m.tif"
-    gdalwarp -overwrite -r cubic -dstnodata 0 -tr $res $res $ortho ${ortho%.*}_${res}m.tif 
+    gdalwarp -overwrite -r average -dstnodata 0 -tr $res $res $ortho ${ortho%.*}_${res}m.tif 
 fi
 img=${img%.*}_${res}m.tif
+
+if [ -e ${img%.*}_toa.tif ] ; then
+    echo "Found existing toa image: ${img%.*}_toa.tif"
+    exit
+fi
 
 #Create list of available xml
 #Note: older versions of dg_mosaic didn't output average MEANSUNEL, limit to subscene xml
