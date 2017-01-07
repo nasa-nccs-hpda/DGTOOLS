@@ -573,8 +573,8 @@ fi
 #Note: NoData in GoodPixelMap is broken for AffineEpipolar
 #corrperc=$(asp_corrstats.py ${out}-GoodPixelMap.tif)
 #echo; echo "Correlation success: $corrperc %"; echo
-
-base_dem_opt+="--nodata-value $ndv"
+dem_ndv=-9999
+base_dem_opt+="--nodata-value $dem_ndv"
 base_dem_opt+=" --remove-outliers --remove-outliers-params 75.0 3.0"
 #base_dem_opt+=" --remove-outliers --remove-outliers-params 100.0 9999.0"
 #base_dem_opt+=" --max-valid-triangulation-error 8" 
