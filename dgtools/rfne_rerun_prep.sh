@@ -50,6 +50,7 @@ outdir=parabolic
 #outdir=parabolic_full_sm3
 #outdir=parabolic_full_sm1
 #outdir=write_error
+
 if [ ! -d $outdir ]; then
     mkdir -pv $outdir 
 fi
