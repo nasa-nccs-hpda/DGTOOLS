@@ -10,6 +10,13 @@
 #Fix the hack-y resolution and filename handling - just maintin variables for L, R, Lxml, Rxml to pass into stereo
 #Need more log output
 
+#Extract specified tag from xml file
+function gettag() {
+    xml=$1
+    tag=$2
+    echo $(grep "$tag" $xml | awk -F'[<>]' '{print $3}')
+}
+
 if [ $# -ne 1 ]; then
     echo
     echo "Error: No input directory provided"
@@ -19,12 +26,14 @@ if [ $# -ne 1 ]; then
     exit 1
 fi
 
-#Extract specified tag from xml file
-function gettag() {
-    xml=$1
-    tag=$2
-    echo $(grep "$tag" $xml | awk -F'[<>]' '{print $3}')
-}
+#Input directory
+dir=$1
+
+#Used for kernel test
+#spm=$2
+#corrkernel=$3
+#rfnekernel=$4
+#erode_px=$5
 
 os=$(uname)
 
@@ -37,11 +46,12 @@ ncpu=$(cat /proc/cpuinfo | egrep "core id|physical id" | tr -d "\n" | sed s/phys
 #PBS sets NCPUS based on number of cores available per node
 if [ -z "$NCPUS" ] ; then 
     #If running on bridge or pfe nodes, don't hog all cores
-    if (( $ncpu > 20 )) ; then
-        ncpu=16
-    fi
+    #if (( $ncpu > 20 )) ; then
+    #    ncpu=16
+    #fi
     export NCPUS=$ncpu
 fi
+export NCPUS=$ncpu
 
 #******************************************************************
 
@@ -60,6 +70,20 @@ gdal_opt+=" -co BLOCKXSIZE=256 -co BLOCKYSIZE=256"
 #crop_extent="-195712.13 -2286712.83 -170650.72 -2256490.42"
 #Jak front test
 #crop_extent='-187699 -2281929 -176633 -2271308'
+#SCG, UTM 10N
+#crop_extent='641873 5355568 646107 5360478'
+#Rainier summer extent, UTM 10N
+#crop_extent='583240 5179200 608680 5202970'
+#Rainier sumit, UTM 10N
+#crop_extent='590580.0 5186456.0 598084.0 5193440.0'
+#Oso valley
+#AEA
+#'-521020 594667 -488443 623334'
+#UTM 10N
+#Oso Valley
+#crop_extent='572470 5339930 603070 53561410'
+#Oso slide
+#crop_extent='583990 5346290 587600 5349790'
 
 if [ -n "$crop_extent" ] ; then
     echo "User-defined crop extent: $crop_extent"
@@ -133,9 +157,13 @@ stereo_opt+=" --individually-normalize"
 #3=affine
 spm=1
 stereo_opt+=" --subpixel-mode $spm"
-#Use this for parabolic to improve resolution
-stereo_opt+=" --subpixel-kernel 21 21"
-#stereo_opt+=" --subpixel-kernel 31 31"
+
+#Set correlation kernel sizes
+corrkernel=21
+rfnekernel=21
+#rfnekernel=11
+stereo_opt+=" --corr-kernel $corrkernel $corrkernel"
+stereo_opt+=" --subpixel-kernel $rfnekernel $rfnekernel"
 
 #Create symlinks to mapped L/R images instead of normalizing
 #NOTE: BayesEM refinement requires normalization up front
@@ -176,15 +204,13 @@ stereo_opt+=" --corr-max-levels $max_lv"
 timeout=480
 #timeout=600
 #timeout=1200
+#timeout=1800
 stereo_opt+=" --corr-timeout $timeout"
 
 #Filtering mode
 stereo_opt+=" --filter-mode 1"
 
 #Erosion in stereo_fltr
-#erode_px=8192
-#erode_px=4096
-#erode_px=2048
 #This is best setting to use for Antarctica
 erode_px=1024
 #erode_px=32
@@ -213,6 +239,14 @@ if $pleiades ; then
     #rpcdem=$rpcdir/ned1/ned1_tiles_glac24k_115kmbuff.vrt
     #rpcdem=$rpcdir/gulkana_wolverine_ArcticDEM/gulkana_wolverine_ArcticDEM_8m.vrt
     rpcdem=$rpcdir/hma/srtm1/hma_srtm_gl1.vrt
+    #SCG merge
+    #rpcdem=/nobackupp8/deshean/conus/scg_rerun/scg_2012-2016_8m_trans_mos-tile-0.tif
+    #rpcdem=/nobackupp8/deshean/conus/scg_rerun/scg_2012-2016_8m_trans_mos_burn_2008-tile-0.tif
+    #Rainier noforest
+    #rpcdem=/nobackupp8/deshean/conus/rainier_rerun/mos_seasonal_summer-tile-0_ref.tif
+    #CONUS 8-m mos
+    #rpcdem=/nobackup/deshean/conus/dem2/conus_8m_tile_coreg_round3_summer2014-2016/conus_8m_tile_coreg_round3_summer2014-2016.vrt
+    #rpcdem=/nobackup/deshean/conus/dem2/oso_rerun/oso_blend_7px_mos-tile-0_filt5px_filt5px.tif
 else
     rpcdir=/Volumes/insar5/dshean
     #rpcdem=$rpcdir/MtStHelens/NED_13/n47w122_n47w123_mos_32610.tif
@@ -263,12 +297,10 @@ set -e
 echo "Current directory: " `pwd`
 echo
 
-#Input directory
-dir=$1
 cd $dir
 #Set up striping for outdir that will contain large files
 if $pleiades ; then
-    lfs setstripe -c 20 .
+    lfs setstripe -c 28 .
 fi
 
 echo "Current directory: " `pwd`
@@ -421,10 +453,12 @@ if $map ; then
     #Determine stereo intersection bbox up front from xml files
     if [ -z "$crop_extent" ] ; then
         echo "Computing intersection extent:"
+        #Want to compute intersection with rpcdem as well
         map_extent=$(dg_stereo_int.py ${imgL}.r100.xml ${imgR}.r100.xml "$proj")
     else
         echo "Using user-specified crop extent:"
         map_extent=$crop_extent
+        unset crop_extent
     fi
     echo $map_extent
     echo
@@ -467,6 +501,7 @@ fi
 #No need for WV02 tag, as IDs contains satellite number (WV01=102, WV02=103)
 #Want pair date and time in filename
 outdir=dem${outext}
+#outdir=dem${outext}_${spm}_${corrkernel}_${rfnekernel}_${erode_px}
 
 if [ ! -d $outdir ]; then
     mkdir -pv $outdir
@@ -556,8 +591,10 @@ if [ "$e" -lt "5" ]; then
     #eval time parallel_stereo -e $e $pstereo_opt $stereo_opt $stereo_arg 
 fi
 
+#This should be done automatically by ASP now
 #Copy projection info from inputs to outputs, scaling appropriately
-if $map ; then
+#if $map ; then
+if false ; then
     ext_list="L_sub R_sub D_sub D"
     #Note: these should still be same dimensions as L.tif, even with --left-image-crop-win
     #if [ -z "$window" ]; 
@@ -634,7 +671,7 @@ do
 done
 
 if $parallel_point2dem ; then
-    if (( $NCPUS > 16 )) ; then
+    if (( $NCPUS > 15 )) ; then
         njobs=3
     else
         njobs=2
@@ -651,7 +688,7 @@ dem_opt+=" --tr $res"
 #Write out DRG
 if $drg ; then
     #Hole filling slows things down considerably
-    #dem_opt+=" --orthoimage-hole-fill-len 256"
+    dem_opt+=" --orthoimage-hole-fill-len 256"
     #dem_opt+=" --orthoimage-hole-fill-len 1024"
     #Note: now need to specify PC.tif before L.tif
     dem_opt+=" ${out}-PC.tif"
@@ -672,7 +709,6 @@ if $drg ; then
         echo point2dem $dem_opt 
         echo
         eval time point2dem $dem_opt 
-        #gdaladdo_lzw.py ${out}-DRG.tif
         if [ ! -e ${prefix}-DRG_11b.tif ] ; then
             if $map ; then
                 gdal_translate $gdal_opt -ot UInt16 -a_nodata $ndv ${prefix}-DRG.tif ${prefix}-DRG_11b.tif
@@ -685,7 +721,7 @@ if $drg ; then
                 gdal_translate $gdal_opt -ot UInt16 -scale ${L_mm[0]} ${L_mm[1]} ${orig_mm[0]} ${orig_mm[1]} \
                 -a_nodata $ndv ${prefix}-DRG.tif ${prefix}-DRG_11b.tif 
             fi
-            gdaladdo_lzw.py ${prefix}-DRG_11b.tif
+            #gdaladdo_ro.sh ${prefix}-DRG_11b.tif
         fi
     fi
     #Now downsample and reduce to 8-bit
@@ -719,6 +755,3 @@ echo
 date
 echo; echo "Total wall time (hr): $t_diff_hr"
 echo
-
-exit
-
