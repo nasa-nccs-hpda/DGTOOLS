@@ -38,8 +38,9 @@ else if [ "${#ids[@]}" -eq "2" ] ; then
     #xml1=$(ls -t $dir/*${ids[0]}*.xml | grep P1BS | head -1) 
     #xml2=$(ls -t $dir/*${ids[1]}*.xml | grep P1BS | head -1) 
 
-    xml1=$(ls -t $dir/*${ids[0]}*.xml | head -1) 
-    xml2=$(ls -t $dir/*${ids[1]}*.xml | head -1) 
+    #The 'grep -v aux' exclude any stats files
+    xml1=$(ls -t $dir/*${ids[0]}*.xml | grep -v aux | head -1) 
+    xml2=$(ls -t $dir/*${ids[1]}*.xml | grep -v aux | head -1) 
 
     #This extracts mean GSD for the mosaiced products
     #Note: some older deliveries are missing MEANPRODUCT tags
