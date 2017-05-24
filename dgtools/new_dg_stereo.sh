@@ -84,6 +84,8 @@ gdal_opt+=" -co BLOCKXSIZE=256 -co BLOCKYSIZE=256"
 #crop_extent='572470 5339930 603070 53561410'
 #Oso slide
 #crop_extent='583990 5346290 587600 5349790'
+#Ngozumpa extent, UTM45N
+#crop_extent='464935 3085769 480079 3110324'
 
 if [ -n "$crop_extent" ] ; then
     echo "User-defined crop extent: $crop_extent"
@@ -201,10 +203,10 @@ stereo_opt+=" --corr-max-levels $max_lv"
 
 #Timeout for tile in seconds
 #timeout=360
-timeout=480
+#timeout=480
 #timeout=600
 #timeout=1200
-#timeout=1800
+timeout=1800
 stereo_opt+=" --corr-timeout $timeout"
 
 #Filtering mode
@@ -212,8 +214,9 @@ stereo_opt+=" --filter-mode 1"
 
 #Erosion in stereo_fltr
 #This is best setting to use for Antarctica
-erode_px=1024
-#erode_px=32
+#erode_px=1024
+#erode_px=256
+erode_px=32
 stereo_opt+=" --erode-max-size $erode_px"
 
 #stereo tri pc error filter
@@ -237,8 +240,9 @@ if $pleiades ; then
     #rpcdem=$rpcdir/NED_nw_10m_utm.tif
     #rpcdem=$rpcdir/NED_nw_10m_utm_WGS84.tif
     #rpcdem=$rpcdir/ned1/ned1_tiles_glac24k_115kmbuff.vrt
+    rpcdem=$rpcdir/ned1_2003/ned1_2003_adj.vrt
     #rpcdem=$rpcdir/gulkana_wolverine_ArcticDEM/gulkana_wolverine_ArcticDEM_8m.vrt
-    rpcdem=$rpcdir/hma/srtm1/hma_srtm_gl1.vrt
+    #rpcdem=$rpcdir/hma/srtm1/hma_srtm_gl1.vrt
     #SCG merge
     #rpcdem=/nobackupp8/deshean/conus/scg_rerun/scg_2012-2016_8m_trans_mos-tile-0.tif
     #rpcdem=/nobackupp8/deshean/conus/scg_rerun/scg_2012-2016_8m_trans_mos_burn_2008-tile-0.tif
@@ -247,6 +251,7 @@ if $pleiades ; then
     #CONUS 8-m mos
     #rpcdem=/nobackup/deshean/conus/dem2/conus_8m_tile_coreg_round3_summer2014-2016/conus_8m_tile_coreg_round3_summer2014-2016.vrt
     #rpcdem=/nobackup/deshean/conus/dem2/oso_rerun/oso_blend_7px_mos-tile-0_filt5px_filt5px.tif
+    #rpcdem=/nobackupp8/deshean/hma/ngozumpa2/ngozumpa_8m_all-tile-0.tif
 else
     rpcdir=/Volumes/insar5/dshean
     #rpcdem=$rpcdir/MtStHelens/NED_13/n47w122_n47w123_mos_32610.tif

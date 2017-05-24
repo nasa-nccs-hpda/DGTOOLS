@@ -27,6 +27,6 @@ fi
 #Can also do 12-bit JPEG compressed tif
 #gdal_translate -a_nodata 0 -co TILED=YES -co COMPRESS=JPEG -co NBITS=12 -co BIGTIFF=YES $ortho $out
 
-#rm $dir/*ortho*m.{tif,xml}
-list=$(ls */*ortho_*m.tif | grep -v _30m)
-rm $list
+#Now delete existing orthoimages (large filesize)
+#list=$(ls */*ortho_*m.tif | grep -v _30m)
+#rm $list
