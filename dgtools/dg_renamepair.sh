@@ -19,6 +19,11 @@ ntf1=$(ls *ntf | head -1)
 ntf1_str=$(echo $ntf1 | cut -c 1-13)
 ids=($(dg_get_ids.py .))
 
+outdir=/Volumes/e/SnowEx/SnowEx_DG_DVD/rename
+if [ ! -d $outdir ] ; then
+    mkdir $outdir
+fi
+
 pairdir=$outdir/${ntf1_str}_${ids[0]}_${ids[1]}
 
 mkdir -pv $pairdir
