@@ -6,8 +6,7 @@ import glob
 from datetime import datetime, timedelta
 
 import numpy as np
-import ogr
-import osr
+from osgeo import gdal, ogr, osr
 
 from pygeotools.lib import geolib
 from pygeotools.lib import timelib
@@ -651,6 +650,19 @@ def stereo_intersection_xml_fn(xml1, xml2, bbox=False):
     if bbox:
         return igeom.GetEnvelope()
     return igeom 
+
+def stereo_intersection_fn(fn1, fn2, bbox=False):
+    ds1 = gdal.Open(fn1)
+    ds2 = gdal.Open(fn2)
+    return stereo_intersection_ds(ds1, ds2, bbox)
+
+def stereo_intersection_ds(ds1, ds2, bbox=False):
+    geom1 = geolib.ds_geom(ds1)
+    geom2 = geolib.ds_geom(ds2)
+    igeom = geolib.geom_intersection([geom1, geom2])
+    if bbox:
+        return igeom.GetEnvelope()
+    return igeom
 
 #Return a numpy array containing ephemeris table
 def getEphem(xml_fn):
