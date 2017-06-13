@@ -4,7 +4,7 @@
 #list=$(ls -d */*PAN)
 #Set output directory
 #outdir=/Volumes/500GB_1/DG_DVD/rename
-#outdir=${PWD}/rename
+outdir=${PWD}/rename
 #for i in $list; do dg_renamepair.sh $i; done
 
 indir=$1
@@ -12,7 +12,7 @@ pushd $indir
 
 for i in *NTF *XML
 do
-dg_rename.py $i
+    dg_rename.py $i
 done
 
 ntf1=$(ls *ntf | head -1)
