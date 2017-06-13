@@ -161,6 +161,10 @@ spm=1
 stereo_opt+=" --subpixel-mode $spm"
 
 #Set correlation kernel sizes
+#This worked well for PNW forests
+#corrkernel=31
+#rfnekernel=31
+#A good compromise between resolution and continuity
 corrkernel=21
 rfnekernel=21
 #rfnekernel=11
@@ -203,10 +207,10 @@ stereo_opt+=" --corr-max-levels $max_lv"
 
 #Timeout for tile in seconds
 #timeout=360
-#timeout=480
+timeout=480
 #timeout=600
 #timeout=1200
-timeout=1800
+#timeout=1800
 stereo_opt+=" --corr-timeout $timeout"
 
 #Filtering mode
@@ -214,9 +218,9 @@ stereo_opt+=" --filter-mode 1"
 
 #Erosion in stereo_fltr
 #This is best setting to use for Antarctica
-#erode_px=1024
+erode_px=1024
 #erode_px=256
-erode_px=32
+#erode_px=32
 stereo_opt+=" --erode-max-size $erode_px"
 
 #stereo tri pc error filter
@@ -240,9 +244,9 @@ if $pleiades ; then
     #rpcdem=$rpcdir/NED_nw_10m_utm.tif
     #rpcdem=$rpcdir/NED_nw_10m_utm_WGS84.tif
     #rpcdem=$rpcdir/ned1/ned1_tiles_glac24k_115kmbuff.vrt
-    rpcdem=$rpcdir/ned1_2003/ned1_2003_adj.vrt
+    #rpcdem=$rpcdir/ned1_2003/ned1_2003_adj.vrt
     #rpcdem=$rpcdir/gulkana_wolverine_ArcticDEM/gulkana_wolverine_ArcticDEM_8m.vrt
-    #rpcdem=$rpcdir/hma/srtm1/hma_srtm_gl1.vrt
+    rpcdem=$rpcdir/hma/srtm1/hma_srtm_gl1.vrt
     #SCG merge
     #rpcdem=/nobackupp8/deshean/conus/scg_rerun/scg_2012-2016_8m_trans_mos-tile-0.tif
     #rpcdem=/nobackupp8/deshean/conus/scg_rerun/scg_2012-2016_8m_trans_mos_burn_2008-tile-0.tif
@@ -305,7 +309,7 @@ echo
 cd $dir
 #Set up striping for outdir that will contain large files
 if $pleiades ; then
-    lfs setstripe -c 28 .
+    lfs setstripe -c $ncpu .
 fi
 
 echo "Current directory: " `pwd`
@@ -514,7 +518,7 @@ fi
 
 #Set up striping for outdir that will contain large files
 if $pleiades ; then
-    lfs setstripe -c 20 $outdir
+    lfs setstripe -c $ncpu $outdir
 fi
 
 #Hack to replace existing timestamp
@@ -674,6 +678,10 @@ do
         fi
     fi
 done
+
+#Create 16-bit orthoimage from nadir ID
+#ortho_proc.sh $dir 
+#rm ${imgL}${outext}.tif ${imgR}${outext}.tif ${imgL}${outext}.xml ${imgR}${outext}.xml 
 
 if $parallel_point2dem ; then
     if (( $NCPUS > 15 )) ; then
