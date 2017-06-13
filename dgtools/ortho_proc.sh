@@ -3,7 +3,7 @@
 #Use this to create 16-bit version of more nadir orthoimage, free up space
 
 #qsub -I -q devel -lselect=1:model=bro,walltime=2:00:00
-#parallel --jobs 16 --delay 1 --verbose --progress 'ortho_proc.sh {}' ::: *00
+#parallel --jobs 14 --delay 1 --verbose --progress 'ortho_proc.sh {}' ::: *00
 
 dir=$1
 
