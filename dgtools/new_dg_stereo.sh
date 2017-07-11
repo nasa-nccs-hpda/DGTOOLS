@@ -119,7 +119,7 @@ drg=false
 error=false
 
 #Remove intermediate files, (PC, F)?
-rmfiles=false
+rmfiles=true
 
 #Compress output?
 #Note: Pleiades compresses everything on Lou going to tape, turn off
@@ -332,6 +332,20 @@ fi
 #Note: output ndv for mosaics is hardcoded to 0
 echo ntfmos.sh 
 time ntfmos.sh 
+
+#If ntfmos was successful for both, remove corr
+nr100=$(ls *r100.tif | wc -l)
+if (( "$nr100" == "2" )) ; then
+    if $rmfiles ; then
+        if ls *corr.tif 1> /dev/null 2>&1; then
+            echo "Removing corr files"
+            rm -v *corr.{tif,xml}
+        fi
+    fi
+else
+    echo "Unable to find two input dg_mosaic images"
+    exit
+fi
 
 #Determine L and R based on resolution
 #Better to go through all xml files, find avg MEANPRODUCTGSD, but this works
@@ -745,8 +759,8 @@ fi
 #Clean up unnecessary files
 if $rmfiles ; then
     echo; echo "Removing intermediate files"
-    #for i in PC F L R; do
-    for i in PC F ; do
+    #for i in PC F L R RD D; do
+    for i in PC F RD; do
         if [ -e ${out}-${i}.tif ]; then
             rm -v ${out}-${i}.tif
         fi
