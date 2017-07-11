@@ -73,7 +73,7 @@ for id in ids:
     elif len(geom_list) == 1:
         id_geom = geom
     else:
-        sys.exit("Unable to extract geometry")
+        sys.exit("%s: Unable to extract geometry" % dir)
     id_geom = geom_ct(id_geom)
     id_geom_list.append(id_geom)
     if write_shp:
