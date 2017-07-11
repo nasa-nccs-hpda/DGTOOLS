@@ -4,11 +4,14 @@
 #This contains links to all mono
 imgdir=/u/deshean/hma/mono
 
+cd $imgdir
+#Link all mono images
+#for i in ../2*/imagery/mono/*00; do ln -s $i .; done
+
 #This is output from validpairs, contains pair names
 pairlist=dg_imagery_index_20161128_all_dg_imagery_index_20161128_all_CC20_rgi50_32644_validpairs_pairname.txt
-outdir=/nobackup/deshean/hma/hma2
+outdir=/nobackup/deshean/hma/validpairs_20170711
 
-cd $imgdir 
 #Generate list of ID subdir
 idlist=$(ls -d *00)
 
