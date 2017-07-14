@@ -12,7 +12,7 @@
 rm="rm"
 
 #This isolates past the dg_mosaic stage - can delete ntf and corr
-list=$(ls */*ortho*m.tif | awk -F'/' '{print $1}' | sort -u)
+list=$(ls */*ortho*.tif | awk -F'/' '{print $1}' | sort -u)
 
 for i in $list
 do 
