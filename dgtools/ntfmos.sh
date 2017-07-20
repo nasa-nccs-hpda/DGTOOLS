@@ -90,6 +90,9 @@ if [ ! -z "$ntf_list" ] ; then
     #Fix seam offsets between subscenes
     #mos_opt+=" --fix-seams"
 
+    #Ignore ephemeris and duplicate file errors
+    mos_opt+=" --ignore-inconsistencies"
+
     for id in ${ids[@]}; do
         outprefix=$id
         if [ ! -e ${outprefix}.r100.tif ]; then
