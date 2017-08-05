@@ -8,7 +8,7 @@
 set -x
 
 #Cloud cover percentage filter
-cloud=75
+cloud=25
 
 inshp=$1
 #lyr=${inshp%.*}
@@ -19,12 +19,14 @@ inshp=$1
 #lyr=dg_archive_index_2016jul07_US_all
 #Global gdb
 #lyr=dg_imagery_index_stereo
-lyr=dg_imagery_index_all
+#lyr=dg_imagery_index_all
+#lyr=dg_imagery_index_stereo_cc20
+lyr=dg_imagery_index_all_cc20
 
-ogr2ogr -overwrite -sql "SELECT * from $lyr WHERE 'CLOUDCOVER' < $cloud" ${inshp%.*}_${lyr}_CC${cloud}.shp $inshp
-#shp=${inshp%.*}_CC${cloud}.shp
-shp=${inshp%.*}_${lyr}_CC${cloud}.shp
-lyr=${shp%.*}
+
+#ogr2ogr -overwrite -sql "SELECT * from $lyr WHERE 'CLOUDCOVER' < $cloud" ${inshp%.*}_${lyr}_CC${cloud}.shp $inshp
+#shp=${inshp%.*}_${lyr}_CC${cloud}.shp
+#lyr=${shp%.*}
 
 #HMA
 proj='EPSG:4326'
@@ -33,6 +35,8 @@ wkt='POLYGON ((66 47, 106 47, 106 25, 66 25, 66 47))'
 
 shp=$inshp
 ogr2ogr -progress -overwrite -clipsrc "$wkt" ${shp%.*}_HMA.shp $shp
+
+exit
 
 #Nov 1
 #Late sept to Late dec
