@@ -1,11 +1,8 @@
 #! /bin/bash
 
-#David Shean
-#dshean@gmail.com
+#Utility to split DG catalog shp into useful spatial and temporal chunks 
 
-#Utility to split DG catalog shp into useful divisions spatially and temporally
-
-set -x
+#set -x
 
 #Cloud cover percentage filter
 cloud=25
@@ -21,20 +18,32 @@ inshp=$1
 #lyr=dg_imagery_index_stereo
 #lyr=dg_imagery_index_all
 #lyr=dg_imagery_index_stereo_cc20
-lyr=dg_imagery_index_all_cc20
-
+#lyr=dg_imagery_index_all_cc20
+for lyr in dg_imagery_index_stereo_cc20 dg_imagery_index_all_cc20
+do
 
 #ogr2ogr -overwrite -sql "SELECT * from $lyr WHERE 'CLOUDCOVER' < $cloud" ${inshp%.*}_${lyr}_CC${cloud}.shp $inshp
 #shp=${inshp%.*}_${lyr}_CC${cloud}.shp
 #lyr=${shp%.*}
 
+shp=$inshp
 #HMA
 proj='EPSG:4326'
 #proj='+proj=longlat +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +no_defs '
-wkt='POLYGON ((66 47, 106 47, 106 25, 66 25, 66 47))'
 
-shp=$inshp
-ogr2ogr -progress -overwrite -clipsrc "$wkt" ${shp%.*}_HMA.shp $shp
+site=HMA
+wkt='POLYGON ((66 47, 106 47, 106 25, 66 25, 66 47))'
+if [ ! -e ${shp%.*}_${lyr}_${site}.shp ] ; then 
+    ogr2ogr -progress -overwrite -clipsrc "$wkt" ${shp%.*}_${lyr}_${site}.shp $shp $lyr
+fi
+
+site=CONUS
+wkt='POLYGON ((-125 49, -104 49, -104 32, -125 32, -125 49))'
+if [ ! -e ${shp%.*}_${lyr}_${site}.shp ] ; then 
+    ogr2ogr -progress -overwrite -clipsrc "$wkt" ${shp%.*}_${lyr}_${site}.shp $shp $lyr
+fi
+
+done
 
 exit
 
