@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
-#Library containing various DigitalGlobe specific functions
+#Library containing various functions for working with DigitalGlobe imagery
+
 import os
 import glob
 from datetime import datetime, timedelta
@@ -97,25 +98,6 @@ def shp_dt_list(shp_fn, dt_f_name=None, geom=False):
 
 def parse_pgc_catalog_stereo(shp_fn):
     return None
-
-#On lfe in mono dir
-#Generate list of cat id and time
-#ls *ntf | awk -F'_' '{print $3 " " $2}' | sort -u -k1,1 > 2015aug28_mono_id_time_list.tx
-#ls *ntf | awk -F'_' '{print $3 " " $2}' | sort -u -k 2 -n > 2015aug28_mono_id_time_list.txt
-#import os
-#from lib import dglib
-#shp_fn = ''
-#time_fn = '2015aug28_mono_id_time_list.txt'
-#out_fn = os.path.splitext(shp_fn)[0]+'_validpairs_time.shp'
-##d_list = dglib.parse_pgc_catalog_mono(shp_fn)
-#d_list = dglib.parse_pgc_catalog_mono(shp_fn, timelist=time_fn)
-#t_list = []
-#for i in d_list:
-#   if i['date'].hour != 0:
-#       t_list.append(i)
-#c = dglib.get_candidates(t_list)
-#g = dglib.get_validpairs(c)
-#dglib.valid_shp(g, out_fn)
 
 def timelist_dict(timelist):
     d = {}
@@ -721,6 +703,8 @@ def refraction_ang(ema):
     return math.degrees(dtheta)
 
 def toa_rad(xml_fn):
+    """Calculate scaling factor for top-of-atmosphere radiance 
+    """
     abscal = np.array((getAllTag(xml_fn, 'ABSCALFACTOR')), dtype=float)
     effbw = np.array((getAllTag(xml_fn, 'EFFECTIVEBANDWIDTH')), dtype=float)
     #Multiply L1B DN by this to obatin top-of-atmosphere spectral radiance image pixels 
@@ -728,6 +712,8 @@ def toa_rad(xml_fn):
     return toa_rad_coeff
 
 def toa_refl(xml_fn, band=None):
+    """Calculate scaling factor for top-of-atmosphere reflectance
+    """
     #These need to be pulled out by individual band
     sat = getTag(xml_fn, 'SATID')
     if band is None:
@@ -745,9 +731,10 @@ def toa_refl(xml_fn, band=None):
     toa_refl_coeff = toa_rad_coeff * (esd**2 * np.pi) / (Esun * np.cos(np.radians(sunang)))
     return toa_refl_coeff
 
-#Calculate Earth-Sun distance
-#Astronomical Units (AU), should have a value between 0.983 and 1.017
 def calcEarthSunDist(dt):
+    """Calculate Earth-Sun distance
+    """
+    #Astronomical Units (AU), should have a value between 0.983 and 1.017
     year = dt.year
     month = dt.month
     day = dt.day
@@ -765,7 +752,6 @@ def calcEarthSunDist(dt):
     jd = int(365.25*(year+4716)) + int(30.6001*(month+1)) + day + (ut/24) + b - 1524.5
     g = 357.529 + 0.98560028 * (jd-2451545.0)
     d = 1.00014 - 0.01671 * np.cos(np.radians(g)) - 0.00014 * np.cos(np.radians(2*g))
-    #print d
     return d
 
 #import glob
