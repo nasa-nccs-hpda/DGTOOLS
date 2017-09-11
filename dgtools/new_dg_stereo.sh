@@ -86,6 +86,8 @@ gdal_opt+=" -co BLOCKXSIZE=256 -co BLOCKYSIZE=256"
 #crop_extent='583990 5346290 587600 5349790'
 #Ngozumpa extent, UTM45N
 #crop_extent='464935 3085769 480079 3110324'
+#Rainier, UTM10N
+crop_extent='583980.563675 5180108.83473 604964.563675 5201532.83473'
 
 if [ -n "$crop_extent" ] ; then
     echo "User-defined crop extent: $crop_extent"
@@ -119,7 +121,7 @@ drg=false
 error=false
 
 #Remove intermediate files, (PC, F)?
-rmfiles=true
+rmfiles=false
 
 #Compress output?
 #Note: Pleiades compresses everything on Lou going to tape, turn off
@@ -162,11 +164,11 @@ stereo_opt+=" --subpixel-mode $spm"
 
 #Set correlation kernel sizes
 #This worked well for PNW forests
-#corrkernel=31
+corrkernel=31
 #rfnekernel=31
 #A good compromise between resolution and continuity
-corrkernel=21
-rfnekernel=21
+#corrkernel=21
+rfnekernel=11
 #rfnekernel=11
 stereo_opt+=" --corr-kernel $corrkernel $corrkernel"
 stereo_opt+=" --subpixel-kernel $rfnekernel $rfnekernel"
@@ -243,10 +245,11 @@ if $pleiades ; then
     #rpcdem=$rpcdir/rainierlidar_8x_wgs84.tif
     #rpcdem=$rpcdir/NED_nw_10m_utm.tif
     #rpcdem=$rpcdir/NED_nw_10m_utm_WGS84.tif
-    #rpcdem=$rpcdir/ned1/ned1_tiles_glac24k_115kmbuff.vrt
+    rpcdem=$rpcdir/ned1/ned1_tiles_glac24k_115kmbuff.vrt
+    #rpcdem=$rpcdir/ned13/ned13_tiles_glac24k_115kmbuff.vrt
     #rpcdem=$rpcdir/ned1_2003/ned1_2003_adj.vrt
     #rpcdem=$rpcdir/gulkana_wolverine_ArcticDEM/gulkana_wolverine_ArcticDEM_8m.vrt
-    rpcdem=$rpcdir/hma/srtm1/hma_srtm_gl1.vrt
+    #rpcdem=$rpcdir/hma/srtm1/hma_srtm_gl1.vrt
     #SCG merge
     #rpcdem=/nobackupp8/deshean/conus/scg_rerun/scg_2012-2016_8m_trans_mos-tile-0.tif
     #rpcdem=/nobackupp8/deshean/conus/scg_rerun/scg_2012-2016_8m_trans_mos_burn_2008-tile-0.tif
@@ -256,6 +259,8 @@ if $pleiades ; then
     #rpcdem=/nobackup/deshean/conus/dem2/conus_8m_tile_coreg_round3_summer2014-2016/conus_8m_tile_coreg_round3_summer2014-2016.vrt
     #rpcdem=/nobackup/deshean/conus/dem2/oso_rerun/oso_blend_7px_mos-tile-0_filt5px_filt5px.tif
     #rpcdem=/nobackupp8/deshean/hma/ngozumpa2/ngozumpa_8m_all-tile-0.tif
+    #Rainier rerun
+    rpcdem=/nobackupp8/deshean/conus_combined/sites/rainier/stack_all/rainier_stack_all-tile-0_dzfilt_0.00-100.00_gaussfill-tile-0.tif
 else
     rpcdir=/Volumes/insar5/dshean
     #rpcdem=$rpcdir/MtStHelens/NED_13/n47w122_n47w123_mos_32610.tif
