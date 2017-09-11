@@ -13,12 +13,17 @@ import sys
 from osgeo import osr
 
 from dgtools.lib import dglib
+from pygeotools.lib import geolib
 
 xml1 = sys.argv[1]
 xml2 = sys.argv[2]
 
 #This should be optional
 proj = sys.argv[3]
+
+pad = None
+if len(sys.argv) == 5:
+    pad = float(sys.argv[4])
 
 #Can extract appropriate proj from xml, don't need to export to Proj4
 #from lib import geolib 
@@ -54,5 +59,8 @@ f.close()
 #print igeom.GetArea()
 
 igeom_env = igeom.GetEnvelope()
+extent=[igeom_env[0], igeom_env[2], igeom_env[1], igeom_env[3]]
+if pad is not None:
+    extent = geolib.pad_extent(extent, width=pad)
 
-print igeom_env[0], igeom_env[2], igeom_env[1], igeom_env[3] 
+print(' '.join(map(str, extent)))
