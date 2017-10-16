@@ -77,6 +77,15 @@ EsunDict = {
 
 wv_ms_bands={1:'C',2:'B',3:'G',4:'Y',5:'R',6:'RE',7:'N',8:'N2'} 
 
+dg_sensor_id_dict = {
+        'QB02':'101'
+        'WV01':'102'
+        'WV02':'103'
+        'WV03':'104'
+        'GE01':'105'
+        'WV04':'106'
+        }
+
 #Catalog az is targetaz (azimuth from sat to target) while xml az is sataz (azimuth from target to sat)
 def az_correct(az):
     az = az - 180.0
