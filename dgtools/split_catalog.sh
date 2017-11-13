@@ -5,7 +5,7 @@
 #set -x
 
 #Cloud cover percentage filter
-cloud=25
+cloud=75
 
 inshp=$1
 #lyr=${inshp%.*}
@@ -19,7 +19,8 @@ inshp=$1
 #lyr=dg_imagery_index_all
 #lyr=dg_imagery_index_stereo_cc20
 #lyr=dg_imagery_index_all_cc20
-for lyr in dg_imagery_index_stereo_cc20 dg_imagery_index_all_cc20
+#for lyr in dg_imagery_index_stereo_cc20 dg_imagery_index_all_cc20
+for lyr in dg_imagery_index_stereo dg_imagery_index_all
 do
 
 #ogr2ogr -overwrite -sql "SELECT * from $lyr WHERE 'CLOUDCOVER' < $cloud" ${inshp%.*}_${lyr}_CC${cloud}.shp $inshp
