@@ -4,6 +4,10 @@
 #dshean@gmail.com
 #4/3/15
 
+#NOTE: can now do this with GDAL vrt
+#http://www.gdal.org/gdal_vrttut.html
+#http://www.gdal.org/gdal_pansharpen.html
+
 #Sample data in /scr/pansharpen_test
 
 #Pansharpen WorldView-2 imagery
