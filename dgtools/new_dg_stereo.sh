@@ -464,6 +464,9 @@ fi
 if $map ; then
     outext="_ortho"
     map_opt+=" -t rpc --nodata-value $ndv --t_srs \"$proj\""
+    if $bundle ; then 
+        map_opt+=" --bundle-adjust-prefix $ba_prefix"
+    fi
     if [[ -n $res ]]; then
         map_opt+=" --tr $res"
         #Note: res format is %0.3f
