@@ -19,15 +19,16 @@ inshp=$1
 #lyr=dg_imagery_index_all
 #lyr=dg_imagery_index_stereo_cc20
 #lyr=dg_imagery_index_all_cc20
-#for lyr in dg_imagery_index_stereo_cc20 dg_imagery_index_all_cc20
-for lyr in dg_imagery_index_stereo dg_imagery_index_all
+for lyr in dg_imagery_index_stereo_cc20 dg_imagery_index_all_cc20
+#for lyr in dg_imagery_index_stereo dg_imagery_index_all
 do
+
+shp=$inshp
 
 #ogr2ogr -overwrite -sql "SELECT * from $lyr WHERE 'CLOUDCOVER' < $cloud" ${inshp%.*}_${lyr}_CC${cloud}.shp $inshp
 #shp=${inshp%.*}_${lyr}_CC${cloud}.shp
 #lyr=${shp%.*}
 
-shp=$inshp
 #HMA
 proj='EPSG:4326'
 #proj='+proj=longlat +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +no_defs '
