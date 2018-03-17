@@ -93,6 +93,9 @@ if [ ! -z "$ntf_list" ] ; then
     #Ignore ephemeris and duplicate file errors
     mos_opt+=" --ignore-inconsistencies"
 
+    #Only write out new xml
+    #mos_opt+=" --skip-tif-gen"
+
     for id in ${ids[@]}; do
         outprefix=$id
         if [ ! -e ${outprefix}.r100.tif ]; then
