@@ -5,6 +5,7 @@
 #Input directory containing DG Ids
 dir=$1
 cd $dir
+echo $dir
 
 #Use the image closest to nadir
 #This should work for directories containing one or two IDs
