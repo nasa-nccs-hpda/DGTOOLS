@@ -16,6 +16,6 @@ setup(name='dgtools',
     long_description=open('README.md').read(),
     install_requires=['numpy','gdal','pygeotools','wget'],
     #Note: this will write to /usr/local/bin
-    scripts=['dgtools/validpairs.py',]
+    #scripts=['dgtools/validpairs.py',]
 )
 
