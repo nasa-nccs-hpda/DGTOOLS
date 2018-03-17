@@ -35,14 +35,14 @@ set -e
 if [ ! -e $out ] ; then 
     echo "Creating $out"
     gdal_translate -ot UInt16 -a_nodata 0 -co TILED=YES -co COMPRESS=LZW -co PREDICTOR=2 -co BIGTIFF=YES $ortho $out
-    #gdaladdo_ro.sh $out
+    gdaladdo_ro.sh $out
 else
     echo "Found existing 16b ortho: $out"
 fi
 
 ortho=$(ls $dir/1*_ortho*m.tif | grep -v 'm_' | grep -v _30m)
 #echo $ortho
-rm -v $ortho
+#rm -v $ortho
 
 #JPEG2000
 #Need to use ASP GDAL, which is compiled against OpenJPEG
