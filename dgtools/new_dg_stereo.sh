@@ -17,11 +17,10 @@ function gettag() {
     echo $(grep "$tag" $xml | awk -F'[<>]' '{print $3}')
 }
 
-if [ $# -ne 1 ]; then
+if [[ "$#" -lt 1 ]] ; then
     echo
-    echo "Error: No input directory provided"
-    echo "Usage is: $(basename $0) srcdir"
-    echo "Where srcdir contains ntf or mosaiced tif files"
+    echo "Usage is: $(basename $0) pairdir [rpcdem]"
+    echo "Where pairdir contains ntf or mosaiced tif files"
     echo
     exit 1
 fi
@@ -34,6 +33,18 @@ dir=$1
 #corrkernel=$3
 #rfnekernel=$4
 #erode_px=$5
+
+if [[ "$#" -eq 2 ]] ; then
+    #Input rpc dem
+    #Used for site reprocessing
+    rpcdem=$2
+    rpcdem=$(realpath $rpcdem)
+
+    if [ ! -e $rpcdem ] ; then
+        echo "Unable to find input RPC DEM: $rpcdem"
+        exit 1
+    fi
+fi
 
 os=$(uname)
 
@@ -87,7 +98,29 @@ gdal_opt+=" -co BLOCKXSIZE=256 -co BLOCKYSIZE=256"
 #Ngozumpa extent, UTM45N
 #crop_extent='464935 3085769 480079 3110324'
 #Rainier, UTM10N
-crop_extent='583980.563675 5180108.83473 604964.563675 5201532.83473'
+#crop_extent='583980.563675 5180108.83473 604964.563675 5201532.83473'
+#Khumbu, UTM45N
+#This is DEM extent, which is padded by 5 km 
+#crop_extent='471269.0 3083777.37813 498953.277372 3105492.0'
+#This is wgs shp extent
+#(476269.908031, 3088776.406966) - (493954.223316, 3100492.953012)
+#Do 3 km buffer to avoid ortho errors over extreme relief
+#crop_extent='473270 3085776 496954 3103492'
+#Imja, UTM45N
+#crop_extent='485298 3080203 499347 3093857'
+#Thulagi, UTM45N
+#crop_extent='249793 3150127 263194 3162171'
+#Barun, UTM45N
+#crop_extent='501320 3071264 516222 3081311'
+#Kathmandu, UTM45N
+#crop_extent='322103.222482 3050110.19871 352583.222482 3077822.19871'
+#crop_extent='322104 3050112 352582 3077820'
+
+#If input RPC DEM is specified, extract extent
+#Should intersect with image extents, common projection, find intersection
+if [ -n "$rpcdem" ] ; then
+    crop_extent=$(get_extent.py $rpcdem)
+fi
 
 if [ -n "$crop_extent" ] ; then
     echo "User-defined crop extent: $crop_extent"
@@ -233,44 +266,53 @@ stereo_opt+=" --erode-max-size $erode_px"
 #PC is a 6-band tif instead of 4-band
 #stereo_opt+=" --compute-error-vector" 
 
-#For now, hardcode the rpcdem
-if $pleiades ; then
-    rpcdir=/nobackup/deshean/rpcdem
-    #rpcdem=$rpcdir/bedmap2_surface_fill0_WGS84.tif
-    #rpcdem=$rpcdir/bedmap2_surface_fill0_WGS84_gauss1.tif
-    #rpcdem=$rpcdir/jhk_wv32m_blend100_combined_gimpdem_90m_mos_21px_feather_fltr_gauss9px_float32.tif
-    #rpcdem=$rpcdir/gimpdem_90m_gauss2_ndv0.tif
-    #rpcdem=$rpcdir/jakfront_20100709_smooth_16m_rpcdem_4x.tif
-    #rpcdem=$rpcdir/msh_dem_WGS84_fill_shpclip_embed_craterblend_gauss9s2_ds2x_gauss9s2.tif
-    #rpcdem=$rpcdir/rainierlidar_8x_wgs84.tif
-    #rpcdem=$rpcdir/NED_nw_10m_utm.tif
-    #rpcdem=$rpcdir/NED_nw_10m_utm_WGS84.tif
-    rpcdem=$rpcdir/ned1/ned1_tiles_glac24k_115kmbuff.vrt
-    #rpcdem=$rpcdir/ned13/ned13_tiles_glac24k_115kmbuff.vrt
-    #rpcdem=$rpcdir/ned1_2003/ned1_2003_adj.vrt
-    #rpcdem=$rpcdir/gulkana_wolverine_ArcticDEM/gulkana_wolverine_ArcticDEM_8m.vrt
-    #rpcdem=$rpcdir/hma/srtm1/hma_srtm_gl1.vrt
-    #SCG merge
-    #rpcdem=/nobackupp8/deshean/conus/scg_rerun/scg_2012-2016_8m_trans_mos-tile-0.tif
-    #rpcdem=/nobackupp8/deshean/conus/scg_rerun/scg_2012-2016_8m_trans_mos_burn_2008-tile-0.tif
-    #Rainier noforest
-    #rpcdem=/nobackupp8/deshean/conus/rainier_rerun/mos_seasonal_summer-tile-0_ref.tif
-    #CONUS 8-m mos
-    #rpcdem=/nobackup/deshean/conus/dem2/conus_8m_tile_coreg_round3_summer2014-2016/conus_8m_tile_coreg_round3_summer2014-2016.vrt
-    #rpcdem=/nobackup/deshean/conus/dem2/oso_rerun/oso_blend_7px_mos-tile-0_filt5px_filt5px.tif
-    #rpcdem=/nobackupp8/deshean/hma/ngozumpa2/ngozumpa_8m_all-tile-0.tif
-    #Rainier rerun
-    rpcdem=/nobackupp8/deshean/conus_combined/sites/rainier/stack_all/rainier_stack_all-tile-0_dzfilt_0.00-100.00_gaussfill-tile-0.tif
-else
-    rpcdir=/Volumes/insar5/dshean
-    #rpcdem=$rpcdir/MtStHelens/NED_13/n47w122_n47w123_mos_32610.tif
-    #rpcdem=$rpcdir/MtStHelens/LiDAR/msh_dem_4x_fill.tif
-    #rpcdem=$rpcdir/Antarctica/nsidc0422_antarctic_1km_dem/krigged_dem_nsidc_ndv0.tif
-    #rpcdem=$rpcdir/pfe/jakfront_20100709_smooth_16m_rpcdem_4x.tif
-    #rpcdem=$rpcdir/Antarctica/bedmap2/bedmap2_tiff/bedmap2_surface_fill0_WGS84.tif
-    #rpcdem=$rpcdir/Antarctica/bedmap2/bedmap2_tiff/bedmap2_surface_fill0_WGS84_gauss1.tif
-    #rpcdem=$rpcdir/gimp_dem/gimpdem_90m_gauss2_ndv0.tif
-    #rpcdem=$rpcdir/Antarctica/DryValleys/30m_elev_gauss3.tif
+if [ -z "$rpcdem" ] ; then
+    #For now, hardcode the rpcdem
+    if $pleiades ; then
+        rpcdir=/nobackup/deshean/rpcdem
+        #rpcdem=$rpcdir/bedmap2_surface_fill0_WGS84.tif
+        #rpcdem=$rpcdir/bedmap2_surface_fill0_WGS84_gauss1.tif
+        #rpcdem=$rpcdir/jhk_wv32m_blend100_combined_gimpdem_90m_mos_21px_feather_fltr_gauss9px_float32.tif
+        #rpcdem=$rpcdir/gimpdem_90m_gauss2_ndv0.tif
+        #rpcdem=$rpcdir/jakfront_20100709_smooth_16m_rpcdem_4x.tif
+        #rpcdem=$rpcdir/msh_dem_WGS84_fill_shpclip_embed_craterblend_gauss9s2_ds2x_gauss9s2.tif
+        #rpcdem=$rpcdir/rainierlidar_8x_wgs84.tif
+        #rpcdem=$rpcdir/NED_nw_10m_utm.tif
+        #rpcdem=$rpcdir/NED_nw_10m_utm_WGS84.tif
+
+        #rpcdem=$rpcdir/ned1/ned1_tiles_glac24k_115kmbuff.vrt
+
+        #rpcdem=$rpcdir/ned13/ned13_tiles_glac24k_115kmbuff.vrt
+        #rpcdem=$rpcdir/ned1_2003/ned1_2003_adj.vrt
+        #rpcdem=$rpcdir/gulkana_wolverine_ArcticDEM/gulkana_wolverine_ArcticDEM_8m.vrt
+        rpcdem=$rpcdir/hma/srtm1/hma_srtm_gl1.vrt
+        #SCG merge
+        #rpcdem=/nobackupp8/deshean/conus/scg_rerun/scg_2012-2016_8m_trans_mos-tile-0.tif
+        #rpcdem=/nobackupp8/deshean/conus/scg_rerun/scg_2012-2016_8m_trans_mos_burn_2008-tile-0.tif
+        #Rainier noforest
+        #rpcdem=/nobackupp8/deshean/conus/rainier_rerun/mos_seasonal_summer-tile-0_ref.tif
+        #CONUS 8-m mos
+        #rpcdem=/nobackup/deshean/conus/dem2/conus_8m_tile_coreg_round3_summer2014-2016/conus_8m_tile_coreg_round3_summer2014-2016.vrt
+        #rpcdem=/nobackup/deshean/conus/dem2/oso_rerun/oso_blend_7px_mos-tile-0_filt5px_filt5px.tif
+        #rpcdem=/nobackupp8/deshean/hma/ngozumpa2/ngozumpa_8m_all-tile-0.tif
+        #Rainier rerun
+        #rpcdem=/nobackupp8/deshean/conus_combined/sites/rainier/stack_all/rainier_stack_all-tile-0_dzfilt_0.00-100.00_gaussfill-tile-0.tif
+        #rpcdem=/nobackupp8/deshean/hma/sites/khumbu/hma_20170716_mos_8m_warp_dzfilt_0.00-100.00_gaussfill-tile-0.tif
+        #rpcdem=/nobackupp8/deshean/hma/sites2/imja/stack_all/imja_stack_all-tile-0_dzfilt_0.00-200.00_fill.tif
+        #rpcdem=/nobackupp8/deshean/hma/sites2/thulagi/stack_all/thulagi_stack_all-tile-0_dzfilt_0.00-200.00_fill.tif
+        #rpcdem=/nobackupp8/deshean/hma/sites2/imja_barun_8m_mos_all-tile-0_warp_dzfilt_0.00-200.00_fill.tif
+        #rpcdem=/nobackup/deshean/hma/sites2/kathmandu/stack_all/kathmandu_stack_all-tile-0_dzfilt_0.00-200.00_fill.tif
+    else
+        rpcdir=/Volumes/insar5/dshean
+        #rpcdem=$rpcdir/MtStHelens/NED_13/n47w122_n47w123_mos_32610.tif
+        #rpcdem=$rpcdir/MtStHelens/LiDAR/msh_dem_4x_fill.tif
+        #rpcdem=$rpcdir/Antarctica/nsidc0422_antarctic_1km_dem/krigged_dem_nsidc_ndv0.tif
+        #rpcdem=$rpcdir/pfe/jakfront_20100709_smooth_16m_rpcdem_4x.tif
+        #rpcdem=$rpcdir/Antarctica/bedmap2/bedmap2_tiff/bedmap2_surface_fill0_WGS84.tif
+        #rpcdem=$rpcdir/Antarctica/bedmap2/bedmap2_tiff/bedmap2_surface_fill0_WGS84_gauss1.tif
+        #rpcdem=$rpcdir/gimp_dem/gimpdem_90m_gauss2_ndv0.tif
+        #rpcdem=$rpcdir/Antarctica/DryValleys/30m_elev_gauss3.tif
+    fi
 fi
 
 #******************************************************************
@@ -298,7 +340,7 @@ env | grep PATH
 echo
 which stereo
 echo
-stereo_corr --version
+stereo --version
 echo
 
 #This should force exit upon error
