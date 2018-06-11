@@ -96,7 +96,7 @@ def az_correct(az):
 def shp_dt_list(shp_fn, dt_f_name=None, geom=False):
     d_list = geolib.shp_dict(shp_fn, fields=dt_f_name)
     if dt_f_name is None:
-        f_list = d_list[0].keys()
+        f_list = list(d_list[0].keys())
         for f in f_list:
             if 'date' in f:
                 dt_f_name = f
@@ -122,7 +122,7 @@ def parse_pgc_catalog_mono(shp_fn, timelist=None):
     ds = ogr.Open(shp_fn)
     lyr = ds.GetLayer()
     nfeat = lyr.GetFeatureCount()
-    print '%i input features\n' % nfeat
+    print('%i input features\n' % nfeat)
     d_list = []
     for n,feat in enumerate(lyr):
         d = {}
@@ -168,8 +168,8 @@ def parse_pgc_catalog_mono(shp_fn, timelist=None):
         d['geom'] = geolib.geom_dup(geom)
         d_list.append(d)
     d_list_sort = sorted(d_list, key=lambda k: k['date']) 
-    print
-    print '%i features will be considered' % len(d_list_sort)
+    print()
+    print('%i features will be considered' % len(d_list_sort))
     ds = None
     return d_list_sort
 
@@ -246,7 +246,7 @@ def get_candidates_dt(d_list, max_dt=7.0):
     for n,d in enumerate(d_list):
         c_list = []
         dt1 = d['date']
-        print n, dt1
+        print(n, dt1)
         #Find anything forward in time
         dt_idx = n+1 + timelib.get_closest_dt_padded_idx(dt1, dt_list[n+1:], pad=timedelta(days=max_dt))
         if len(dt_idx) > 0:
@@ -262,7 +262,7 @@ def get_candidates_dt(d_list, max_dt=7.0):
                 p = pair_dict(c[0], c[1])
                 candidates.append(p)
             #print '%i pair candidates\n' % len(c_list)
-    print '%i total pair candidates\n' % len(candidates)
+    print('%i total pair candidates\n' % len(candidates))
     return candidates
 
 def get_candidates(d_list):
@@ -272,7 +272,7 @@ def get_candidates(d_list):
         p = pair_dict(c[0], c[1])
         if p['intersection'] is not None:
             candidates.append(p)
-    print '%i pair candidates\n' % len(candidates)
+    print('%i pair candidates\n' % len(candidates))
     return candidates
 
 #This can be used to determine the max time interval for a given location
@@ -336,10 +336,10 @@ def get_validpairs(candidates, min_conv=5, max_conv=70, max_dt_days=1.0, min_are
         #Exclude QB + WV pairs
         if np.array((p['id1_dict']['sensor'] == 'QB02', p['id2_dict']['sensor'] == 'QB02')).nonzero()[0].size == 1:
             continue
-        print p['pairtype'], p['id1_dict']['id'], p['id2_dict']['id'], p['cdate'], p['dt'], p['conv_ang'], p['int_w'], p['int_h'], p['intersection_area'], p['intersection_area_perc'], p['id1_dict']['cloudcover'], p['id2_dict']['cloudcover']
+        print(p['pairtype'], p['id1_dict']['id'], p['id2_dict']['id'], p['cdate'], p['dt'], p['conv_ang'], p['int_w'], p['int_h'], p['intersection_area'], p['intersection_area_perc'], p['id1_dict']['cloudcover'], p['id2_dict']['cloudcover'])
         good.append(p)
-    print
-    print '%i valid pairs' % len(good)
+    print()
+    print('%i valid pairs' % len(good))
     return good
 
 def unique_ids(p_list, out_fn=None):
@@ -348,8 +348,8 @@ def unique_ids(p_list, out_fn=None):
         id_list.extend([i['id1_dict']['id'], i['id2_dict']['id']])
     outlist = list(set(id_list))
     outlist.sort()
-    print len(id_list)
-    print len(outlist)
+    print(len(id_list))
+    print(len(outlist))
     if out_fn is None:
         out_fn = 'validpairs_uniqid.txt'
     f = open(out_fn, 'w')
@@ -540,7 +540,7 @@ def dir_ids(dir, panonly=False):
         imglist.extend(glob.glob(os.path.join(dir,'*[0-9].xml')))
     idlist = [get_id(f) for f in imglist] 
     #Remove any None, return a single list of unique strings
-    idlist = list(set([item for sublist in filter(None, idlist) for item in sublist]))
+    idlist = list(set([item for sublist in [_f for _f in idlist if _f] for item in sublist]))
     return idlist
 
 #This should only return a single ID, not a list
@@ -568,7 +568,7 @@ def getxml(fn):
     try:
         with open(xml_fn) as f: pass
     except IOError as e:
-        print 'Unable to open xml file associated with %s' % fn
+        print('Unable to open xml file associated with %s' % fn)
         xml_fn = None 
     return xml_fn
 
@@ -730,7 +730,7 @@ def toa_refl(xml_fn, band=None):
     band = band.upper()
     key = '%s_BAND_%s' % (sat, band)
     Esun = EsunDict[key] 
-    print key, Esun
+    print(key, Esun)
     msunel = float(getTag(xml_fn, 'MEANSUNEL'))
     sunang = 90.0 - msunel
     dt = xml_dt(xml_fn) 
