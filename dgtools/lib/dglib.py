@@ -3,6 +3,7 @@
 #Library containing various functions for working with DigitalGlobe imagery
 
 import os
+import sys
 import glob
 from datetime import datetime, timedelta
 
@@ -360,11 +361,14 @@ def valid_txt(p_list, out_fn=None):
     import csv
     if out_fn is None:
         out_fn='validpairs.csv'
-    with open(out_fn, 'wb') as f:
-        writer = csv.writer(f)
-        for p in p_list:
-            line = p['pairtype'], p['id1_dict']['id'], p['id2_dict']['id'], p['cdate'], '%0.3f' % (p['dt'].total_seconds()/3600.), p['conv_ang'], p['intersection_area'], p['intersection_area_perc'][0], p['intersection_area_perc'][1], p['id1_dict']['cloudcover'], p['id2_dict']['cloudcover']
-            writer.writerow(line)
+    if sys.version_info >= (3,0,0):
+        f = open(out_fn, 'w', newline='')
+    else:
+        f = open(out_fn, 'wb')
+    writer = csv.writer(f)
+    for p in p_list:
+        line = p['pairtype'], p['id1_dict']['id'], p['id2_dict']['id'], p['cdate'], '%0.3f' % (p['dt'].total_seconds()/3600.), p['conv_ang'], p['intersection_area'], p['intersection_area_perc'][0], p['intersection_area_perc'][1], p['id1_dict']['cloudcover'], p['id2_dict']['cloudcover']
+        writer.writerow(line)
 
 #Write out a shapefile of valid intersections
 def valid_shp(p_list, out_fn=None):
