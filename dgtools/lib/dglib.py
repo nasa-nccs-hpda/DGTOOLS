@@ -337,6 +337,12 @@ def get_validpairs(candidates, min_conv=5, max_conv=70, max_dt_days=1.0, min_are
         #Exclude QB + WV pairs
         if np.array((p['id1_dict']['sensor'] == 'QB02', p['id2_dict']['sensor'] == 'QB02')).nonzero()[0].size == 1:
             continue
+        if p['id1_dict']['id'][0:4] == '104A' or p['id2_dict']['id'][0:4] == '104A':
+            print("Removing SWIR")
+            continue
+        if p['id1_dict']['id'][0:4] == '104C' or p['id2_dict']['id'][0:4] == '104C':
+            print("Removing CAVIS")
+            continue
         print(p['pairtype'], p['id1_dict']['id'], p['id2_dict']['id'], p['cdate'], p['dt'], p['conv_ang'], p['int_w'], p['int_h'], p['intersection_area'], p['intersection_area_perc'], p['id1_dict']['cloudcover'], p['id2_dict']['cloudcover'])
         good.append(p)
     print()
