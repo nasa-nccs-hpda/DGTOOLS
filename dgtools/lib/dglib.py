@@ -211,8 +211,13 @@ def get_pair_intersection(p):
     geom2 = p['id2_dict']['geom']
     intersection = geolib.geom_intersection([geom1, geom2])
     p['intersection'] = intersection
-    #This recomputes for local orthographic - important for width/height calculations
     intersection_local = geolib.geom2localortho(intersection)
+    local_srs = intersection_local.GetSpatialReference()
+    #This recomputes for local orthographic - important for width/height calculations
+    geom1_local = geolib.geom_dup(geom1)
+    geolib.geom_transform(geom1_local, local_srs)
+    geom2_local = geolib.geom_dup(geom2)
+    geolib.geom_transform(geom2_local, local_srs)
     if intersection is not None:
         #Area calc shouldn't matter too much
         intersection_area = intersection_local.GetArea()
@@ -221,7 +226,7 @@ def get_pair_intersection(p):
         p['int_w'] = float('%0.2f' % (int_w/1000.))
         p['int_h'] = float('%0.2f' % (int_h/1000.))
         p['intersection_area'] = float("{0:.2f}".format(intersection_area/1E6))
-        perc = (100*intersection_area/geom1.GetArea(), 100*intersection_area/geom2.GetArea()) 
+        perc = (100.*intersection_area/geom1_local.GetArea(), 100*intersection_area/geom2_local.GetArea()) 
         perc = (float("{0:.2f}".format(perc[0])), float("{0:.2f}".format(perc[1])))
         p['intersection_area_perc'] = perc
     else:
@@ -338,10 +343,10 @@ def get_validpairs(candidates, min_conv=5, max_conv=70, max_dt_days=1.0, min_are
         if np.array((p['id1_dict']['sensor'] == 'QB02', p['id2_dict']['sensor'] == 'QB02')).nonzero()[0].size == 1:
             continue
         if p['id1_dict']['id'][0:4] == '104A' or p['id2_dict']['id'][0:4] == '104A':
-            print("Removing SWIR")
+            #print("Removing SWIR")
             continue
         if p['id1_dict']['id'][0:4] == '104C' or p['id2_dict']['id'][0:4] == '104C':
-            print("Removing CAVIS")
+            #print("Removing CAVIS")
             continue
         print(p['pairtype'], p['id1_dict']['id'], p['id2_dict']['id'], p['cdate'], p['dt'], p['conv_ang'], p['int_w'], p['int_h'], p['intersection_area'], p['intersection_area_perc'], p['id1_dict']['cloudcover'], p['id2_dict']['cloudcover'])
         good.append(p)
@@ -372,9 +377,23 @@ def valid_txt(p_list, out_fn=None):
     else:
         f = open(out_fn, 'wb')
     writer = csv.writer(f)
+    header = ['#pairtype', 'pairname', 'id1', 'id2', 'center_date', 'dt_hr', 'conv_ang', 'int_area', 'id1_area_perc1', 'id2_area_perc2', 'cc1', 'cc2']
+    writer.writerow(header)
     for p in p_list:
-        line = p['pairtype'], p['id1_dict']['id'], p['id2_dict']['id'], p['cdate'], '%0.3f' % (p['dt'].total_seconds()/3600.), p['conv_ang'], p['intersection_area'], p['intersection_area_perc'][0], p['intersection_area_perc'][1], p['id1_dict']['cloudcover'], p['id2_dict']['cloudcover']
+        line = p['pairtype'], p['pairname'], p['id1_dict']['id'], p['id2_dict']['id'], p['cdate'], '%0.3f' % (p['dt'].total_seconds()/3600.), p['conv_ang'], p['intersection_area'], p['intersection_area_perc'][0], p['intersection_area_perc'][1], p['id1_dict']['cloudcover'], p['id2_dict']['cloudcover']
         writer.writerow(line)
+    f.close()
+
+def valid_pairname_txt(p_list, out_fn=None):
+    if out_fn is None:
+        out_fn='validpairs_pairname.txt'
+    if sys.version_info >= (3,0,0):
+        f = open(out_fn, 'w', newline='')
+    else:
+        f = open(out_fn, 'wb')
+    for p in p_list:
+        f.write(p['pairname'])
+    f.close()
 
 #Write out a shapefile of valid intersections
 def valid_shp(p_list, out_fn=None):
