@@ -268,51 +268,41 @@ stereo_opt+=" --erode-max-size $erode_px"
 
 if [ -z "$rpcdem" ] ; then
     #For now, hardcode the rpcdem
-    if $pleiades ; then
-        rpcdir=/nobackup/deshean/rpcdem
-        #rpcdem=$rpcdir/bedmap2_surface_fill0_WGS84.tif
-        #rpcdem=$rpcdir/bedmap2_surface_fill0_WGS84_gauss1.tif
-        #rpcdem=$rpcdir/jhk_wv32m_blend100_combined_gimpdem_90m_mos_21px_feather_fltr_gauss9px_float32.tif
-        #rpcdem=$rpcdir/gimpdem_90m_gauss2_ndv0.tif
-        #rpcdem=$rpcdir/jakfront_20100709_smooth_16m_rpcdem_4x.tif
-        #rpcdem=$rpcdir/msh_dem_WGS84_fill_shpclip_embed_craterblend_gauss9s2_ds2x_gauss9s2.tif
-        #rpcdem=$rpcdir/rainierlidar_8x_wgs84.tif
-        #rpcdem=$rpcdir/NED_nw_10m_utm.tif
-        #rpcdem=$rpcdir/NED_nw_10m_utm_WGS84.tif
+    rpcdir=/nobackup/deshean/rpcdem
+    #rpcdem=$rpcdir/bedmap2_surface_fill0_WGS84.tif
+    #rpcdem=$rpcdir/bedmap2_surface_fill0_WGS84_gauss1.tif
+    #rpcdem=$rpcdir/jhk_wv32m_blend100_combined_gimpdem_90m_mos_21px_feather_fltr_gauss9px_float32.tif
+    #rpcdem=$rpcdir/gimpdem_90m_gauss2_ndv0.tif
+    #rpcdem=$rpcdir/jakfront_20100709_smooth_16m_rpcdem_4x.tif
+    #rpcdem=$rpcdir/msh_dem_WGS84_fill_shpclip_embed_craterblend_gauss9s2_ds2x_gauss9s2.tif
+    #rpcdem=$rpcdir/rainierlidar_8x_wgs84.tif
+    #rpcdem=$rpcdir/NED_nw_10m_utm.tif
+    #rpcdem=$rpcdir/NED_nw_10m_utm_WGS84.tif
 
-        #rpcdem=$rpcdir/ned1/ned1_tiles_glac24k_115kmbuff.vrt
+    #rpcdem=$rpcdir/ned1/ned1_tiles_glac24k_115kmbuff.vrt
 
-        #rpcdem=$rpcdir/ned13/ned13_tiles_glac24k_115kmbuff.vrt
-        #rpcdem=$rpcdir/ned1_2003/ned1_2003_adj.vrt
-        #rpcdem=$rpcdir/gulkana_wolverine_ArcticDEM/gulkana_wolverine_ArcticDEM_8m.vrt
-        rpcdem=$rpcdir/hma/srtm1/hma_srtm_gl1.vrt
-        #SCG merge
-        #rpcdem=/nobackupp8/deshean/conus/scg_rerun/scg_2012-2016_8m_trans_mos-tile-0.tif
-        #rpcdem=/nobackupp8/deshean/conus/scg_rerun/scg_2012-2016_8m_trans_mos_burn_2008-tile-0.tif
-        #Rainier noforest
-        #rpcdem=/nobackupp8/deshean/conus/rainier_rerun/mos_seasonal_summer-tile-0_ref.tif
-        #CONUS 8-m mos
-        #rpcdem=/nobackup/deshean/conus/dem2/conus_8m_tile_coreg_round3_summer2014-2016/conus_8m_tile_coreg_round3_summer2014-2016.vrt
-        #rpcdem=/nobackup/deshean/conus/dem2/oso_rerun/oso_blend_7px_mos-tile-0_filt5px_filt5px.tif
-        #rpcdem=/nobackupp8/deshean/hma/ngozumpa2/ngozumpa_8m_all-tile-0.tif
-        #Rainier rerun
-        #rpcdem=/nobackupp8/deshean/conus_combined/sites/rainier/stack_all/rainier_stack_all-tile-0_dzfilt_0.00-100.00_gaussfill-tile-0.tif
-        #rpcdem=/nobackupp8/deshean/hma/sites/khumbu/hma_20170716_mos_8m_warp_dzfilt_0.00-100.00_gaussfill-tile-0.tif
-        #rpcdem=/nobackupp8/deshean/hma/sites2/imja/stack_all/imja_stack_all-tile-0_dzfilt_0.00-200.00_fill.tif
-        #rpcdem=/nobackupp8/deshean/hma/sites2/thulagi/stack_all/thulagi_stack_all-tile-0_dzfilt_0.00-200.00_fill.tif
-        #rpcdem=/nobackupp8/deshean/hma/sites2/imja_barun_8m_mos_all-tile-0_warp_dzfilt_0.00-200.00_fill.tif
-        #rpcdem=/nobackup/deshean/hma/sites2/kathmandu/stack_all/kathmandu_stack_all-tile-0_dzfilt_0.00-200.00_fill.tif
-    else
-        rpcdir=/Volumes/insar5/dshean
-        #rpcdem=$rpcdir/MtStHelens/NED_13/n47w122_n47w123_mos_32610.tif
-        #rpcdem=$rpcdir/MtStHelens/LiDAR/msh_dem_4x_fill.tif
-        #rpcdem=$rpcdir/Antarctica/nsidc0422_antarctic_1km_dem/krigged_dem_nsidc_ndv0.tif
-        #rpcdem=$rpcdir/pfe/jakfront_20100709_smooth_16m_rpcdem_4x.tif
-        #rpcdem=$rpcdir/Antarctica/bedmap2/bedmap2_tiff/bedmap2_surface_fill0_WGS84.tif
-        #rpcdem=$rpcdir/Antarctica/bedmap2/bedmap2_tiff/bedmap2_surface_fill0_WGS84_gauss1.tif
-        #rpcdem=$rpcdir/gimp_dem/gimpdem_90m_gauss2_ndv0.tif
-        #rpcdem=$rpcdir/Antarctica/DryValleys/30m_elev_gauss3.tif
-    fi
+    #rpcdem=$rpcdir/ned13/ned13_tiles_glac24k_115kmbuff.vrt
+    #rpcdem=$rpcdir/ned1_2003/ned1_2003_adj.vrt
+    #rpcdem=$rpcdir/gulkana_wolverine_ArcticDEM/gulkana_wolverine_ArcticDEM_8m.vrt
+    #rpcdem=$rpcdir/hma/srtm1/hma_srtm_gl1.vrt
+    #Fuego volcano
+    rpcdem=/nobackup/deshean/fuego/fuego_nasadem_hgt_merge_hgt_adj_proj.tif
+    #SCG merge
+    #rpcdem=/nobackupp8/deshean/conus/scg_rerun/scg_2012-2016_8m_trans_mos-tile-0.tif
+    #rpcdem=/nobackupp8/deshean/conus/scg_rerun/scg_2012-2016_8m_trans_mos_burn_2008-tile-0.tif
+    #Rainier noforest
+    #rpcdem=/nobackupp8/deshean/conus/rainier_rerun/mos_seasonal_summer-tile-0_ref.tif
+    #CONUS 8-m mos
+    #rpcdem=/nobackup/deshean/conus/dem2/conus_8m_tile_coreg_round3_summer2014-2016/conus_8m_tile_coreg_round3_summer2014-2016.vrt
+    #rpcdem=/nobackup/deshean/conus/dem2/oso_rerun/oso_blend_7px_mos-tile-0_filt5px_filt5px.tif
+    #rpcdem=/nobackupp8/deshean/hma/ngozumpa2/ngozumpa_8m_all-tile-0.tif
+    #Rainier rerun
+    #rpcdem=/nobackupp8/deshean/conus_combined/sites/rainier/stack_all/rainier_stack_all-tile-0_dzfilt_0.00-100.00_gaussfill-tile-0.tif
+    #rpcdem=/nobackupp8/deshean/hma/sites/khumbu/hma_20170716_mos_8m_warp_dzfilt_0.00-100.00_gaussfill-tile-0.tif
+    #rpcdem=/nobackupp8/deshean/hma/sites2/imja/stack_all/imja_stack_all-tile-0_dzfilt_0.00-200.00_fill.tif
+    #rpcdem=/nobackupp8/deshean/hma/sites2/thulagi/stack_all/thulagi_stack_all-tile-0_dzfilt_0.00-200.00_fill.tif
+    #rpcdem=/nobackupp8/deshean/hma/sites2/imja_barun_8m_mos_all-tile-0_warp_dzfilt_0.00-200.00_fill.tif
+    #rpcdem=/nobackup/deshean/hma/sites2/kathmandu/stack_all/kathmandu_stack_all-tile-0_dzfilt_0.00-200.00_fill.tif
 fi
 
 #******************************************************************
@@ -733,6 +723,10 @@ do
             cmd=''
             cmd+="time point2dem $dem_opt ${out}-PC.tif; "
             cmd+="mv ${out}_${dem_res}m-DEM.tif ${out}-DEM_${dem_res}m.tif; "
+            #Absolute difference filter to remove outliers relative to rpcdem
+            if $map ; then
+                cmd+="filter.py ${out}-DEM_${dem_res}m.tif -filt dz -param $rpcdem -200 200; "
+            fi
             #cmd+="gdaldem hillshade ${out}-DEM_${dem_res}m.tif ${out}-DEM_${dem_res}m_hs.tif"
             cmd_list+=\ \'$cmd\'
         else
@@ -742,10 +736,6 @@ do
         fi
     fi
 done
-
-#Create 16-bit orthoimage from nadir ID
-#ortho_proc.sh $dir 
-#rm ${imgL}${outext}.tif ${imgR}${outext}.tif ${imgL}${outext}.xml ${imgR}${outext}.xml 
 
 if $parallel_point2dem ; then
     if (( $NCPUS > 15 )) ; then
@@ -805,6 +795,11 @@ if $drg ; then
 fi
 
 #mdenoise, or other DEM filtering
+
+echo "Generating 16-bit orthoimage from nadir ID"
+#ortho_proc.sh $dir 
+ortho_proc.sh .
+#rm ${imgL}${outext}.tif ${imgR}${outext}.tif ${imgL}${outext}.xml ${imgR}${outext}.xml 
 
 #Clean up unnecessary files
 if $rmfiles ; then
