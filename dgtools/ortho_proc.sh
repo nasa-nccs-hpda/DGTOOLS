@@ -5,11 +5,16 @@
 #qsub -I -q devel -lselect=1:model=bro,walltime=2:00:00
 #parallel --jobs 14 --delay 1 --verbose --progress 'ortho_proc.sh {}' ::: *00
 
+#list=$(ll -Sr *00/*ortho*m.tif | grep -v _30m | awk '{print $NF}' | awk -F'/' '{print $1}')
+#parallel --jobs 4 --delay 1 --verbose --progress 'ortho_proc.sh {}' ::: $list
+
 dir=$1
 
 id=$(nadir_id.sh $dir | awk '{print $1}')
 #The m_ excludes the 30m.tif products
 ortho=$(ls $dir/${id}_ortho*m.tif 2>/dev/null | grep -v 'm_')
+
+#ls -l $ortho
 
 if [ -z "$ortho" ] ; then 
     echo "Unable to find input ortho tif"
@@ -40,9 +45,13 @@ else
     echo "Found existing 16b ortho: $out"
 fi
 
+#ls -l $out
+
 ortho=$(ls $dir/1*_ortho*m.tif | grep -v 'm_' | grep -v _30m)
-#echo $ortho
-#rm -v $ortho
+echo $ortho
+rm -v $ortho
+
+echo
 
 #JPEG2000
 #Need to use ASP GDAL, which is compiled against OpenJPEG
@@ -52,6 +61,6 @@ ortho=$(ls $dir/1*_ortho*m.tif | grep -v 'm_' | grep -v _30m)
 #gdal_translate -a_nodata 0 -co TILED=YES -co COMPRESS=JPEG -co NBITS=12 -co BIGTIFF=YES $ortho $out
 
 #Now delete existing orthoimages (large filesize)
-#list=$(ls */*ortho_*m.tif | grep -v _30m)
+#list=$(ls */1*ortho_*m.tif | grep -v 30m)
 #rm $list
 
