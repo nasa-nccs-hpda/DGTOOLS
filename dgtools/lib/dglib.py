@@ -392,7 +392,7 @@ def valid_pairname_txt(p_list, out_fn=None):
     else:
         f = open(out_fn, 'wb')
     for p in p_list:
-        f.write(p['pairname'])
+        f.write('%s\n' % p['pairname'])
     f.close()
 
 #Write out a shapefile of valid intersections
