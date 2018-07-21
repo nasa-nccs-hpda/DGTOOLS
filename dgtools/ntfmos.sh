@@ -74,7 +74,7 @@ if [ ! -z "$ntf_list" ] ; then
             time parallel -v --delay 1 -j $ncpu 'wv_correct --threads 2 {} {.}.xml {.}_corr.tif; gdal_edit.py -a_nodata 0 {.}_corr.tif' ::: ${missing[@]}
         fi
         #Now create symlinks for xml
-        for ntf in ${missing[@]} ; do 
+        for ntf in $ntf_list ; do
             if [ -e ${ntf%.*}_corr.tif ] ; then 
                 ln -sf ${ntf%.*}.xml ${ntf%.*}_corr.xml
             fi
