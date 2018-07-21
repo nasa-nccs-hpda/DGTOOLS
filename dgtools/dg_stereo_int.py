@@ -26,7 +26,6 @@ if len(sys.argv) == 5:
     pad = float(sys.argv[4])
 
 #Can extract appropriate proj from xml, don't need to export to Proj4
-#from lib import geolib 
 #proj = geolib.get_proj(dglib.xml2geom(xml1)).ExportToProj4()
 
 igeom = dglib.stereo_intersection_xml_fn(xml1, xml2)
@@ -51,7 +50,6 @@ f.write(out_wkt + '\n')
 f.write(t_srs.ExportToProj4())
 f.close()
 
-#from lib import geolib
 #shp_fn = os.path.splitext(wkt_fn)[0]+'.shp'
 #geolib.geom2shp(igeom, shp_fn)
 

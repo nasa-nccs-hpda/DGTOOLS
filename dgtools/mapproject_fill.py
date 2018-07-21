@@ -64,9 +64,9 @@ if fill:
 #Smooth DEM?
 smooth = False 
 if smooth:
-    from lib import iolib
-from lib import malib
-    from lib import filtlib 
+    from pygeotools.lib import iolib
+    from pygeotools.lib import malib
+    from pygeotools.lib import filtlib 
     rpcdem_b = iolib.ds_getma(rpcdem_ds)
     rpcdem_b_fltr = filtlib.gauss_fltr_astropy(rpcdem_b)
     rpcdem_fltr_fn = os.path.splitext(rpcdem_fn)[0]+'_smooth.tif'
@@ -76,8 +76,8 @@ from lib import malib
 #Do this in inpaint_dem
 erode = False 
 if erode:
-    from lib import iolib
-from lib import malib
+    from pygeotools.lib import iolib
+    from pygeotools.lib import malib
     in_ma = iolib.ds_getma(rpcdem_ds)
     out_ma = malib.mask_islands(in_ma)
     out_fn = os.path.splitext(rpcdem_fn)[0]+'_erode.tif'

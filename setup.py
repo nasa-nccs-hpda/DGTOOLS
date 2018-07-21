@@ -12,7 +12,7 @@ setup(name='dgtools',
     author_email='dshean@gmail.com',
     license='MIT',
     url='https://github.com/dshean/demcoreg',
-    packages=['dgtools'],
+    packages=['dgtools', 'dgtools.lib'],
     long_description=open('README.md').read(),
     install_requires=['numpy','gdal','pygeotools','wget'],
     #Note: this will write to /usr/local/bin
