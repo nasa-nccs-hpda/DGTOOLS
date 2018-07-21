@@ -1,0 +1,85 @@
+#Removed from new_dg_stereo.sh
+#Mostly hardcoded paths and extents
+
+#Jako front+fjord_rock
+#xMin,yMin -193918.98,-2286653.95 : xMax,yMax -170473.04,-2255725.95
+#crop_extent="-193918.98 -2286653.95 -170473.04 -2255725.95"
+#Extended west to include IceBridge ATM track
+#xMin,yMin -195712.13,-2286712.83 : xMax,yMax -171650.72,-2255490.42
+#crop_extent="-195712.13 -2286712.83 -170650.72 -2256490.42"
+#Jak front test
+#crop_extent='-187699 -2281929 -176633 -2271308'
+#SCG, UTM 10N
+#crop_extent='641873 5355568 646107 5360478'
+#Rainier summer extent, UTM 10N
+#crop_extent='583240 5179200 608680 5202970'
+#Rainier sumit, UTM 10N
+#crop_extent='590580.0 5186456.0 598084.0 5193440.0'
+#Oso valley
+#AEA
+#'-521020 594667 -488443 623334'
+#UTM 10N
+#Oso Valley
+#crop_extent='572470 5339930 603070 53561410'
+#Oso slide
+#crop_extent='583990 5346290 587600 5349790'
+#Ngozumpa extent, UTM45N
+#crop_extent='464935 3085769 480079 3110324'
+#Rainier, UTM10N
+#crop_extent='583980.563675 5180108.83473 604964.563675 5201532.83473'
+#Khumbu, UTM45N
+#This is DEM extent, which is padded by 5 km 
+#crop_extent='471269.0 3083777.37813 498953.277372 3105492.0'
+#This is wgs shp extent
+#(476269.908031, 3088776.406966) - (493954.223316, 3100492.953012)
+#Do 3 km buffer to avoid ortho errors over extreme relief
+#crop_extent='473270 3085776 496954 3103492'
+#Imja, UTM45N
+#crop_extent='485298 3080203 499347 3093857'
+#Thulagi, UTM45N
+#crop_extent='249793 3150127 263194 3162171'
+#Barun, UTM45N
+#crop_extent='501320 3071264 516222 3081311'
+#Kathmandu, UTM45N
+#crop_extent='322103.222482 3050110.19871 352583.222482 3077822.19871'
+#crop_extent='322104 3050112 352582 3077820'
+
+if [ -z "$rpcdem" ] ; then
+    #For now, hardcode the rpcdem
+    rpcdir=/nobackup/deshean/rpcdem
+    #rpcdem=$rpcdir/bedmap2_surface_fill0_WGS84.tif
+    #rpcdem=$rpcdir/bedmap2_surface_fill0_WGS84_gauss1.tif
+    #rpcdem=$rpcdir/jhk_wv32m_blend100_combined_gimpdem_90m_mos_21px_feather_fltr_gauss9px_float32.tif
+    #rpcdem=$rpcdir/gimpdem_90m_gauss2_ndv0.tif
+    #rpcdem=$rpcdir/jakfront_20100709_smooth_16m_rpcdem_4x.tif
+    #rpcdem=$rpcdir/msh_dem_WGS84_fill_shpclip_embed_craterblend_gauss9s2_ds2x_gauss9s2.tif
+    #rpcdem=$rpcdir/rainierlidar_8x_wgs84.tif
+    #rpcdem=$rpcdir/NED_nw_10m_utm.tif
+    #rpcdem=$rpcdir/NED_nw_10m_utm_WGS84.tif
+
+    #rpcdem=$rpcdir/ned1/ned1_tiles_glac24k_115kmbuff.vrt
+
+    #rpcdem=$rpcdir/ned13/ned13_tiles_glac24k_115kmbuff.vrt
+    #rpcdem=$rpcdir/ned1_2003/ned1_2003_adj.vrt
+    #rpcdem=$rpcdir/gulkana_wolverine_ArcticDEM/gulkana_wolverine_ArcticDEM_8m.vrt
+    #rpcdem=$rpcdir/hma/srtm1/hma_srtm_gl1.vrt
+    #Fuego volcano
+    rpcdem=/nobackup/deshean/fuego/fuego_nasadem_hgt_merge_hgt_adj_proj.tif
+    #SCG merge
+    #rpcdem=/nobackupp8/deshean/conus/scg_rerun/scg_2012-2016_8m_trans_mos-tile-0.tif
+    #rpcdem=/nobackupp8/deshean/conus/scg_rerun/scg_2012-2016_8m_trans_mos_burn_2008-tile-0.tif
+    #Rainier noforest
+    #rpcdem=/nobackupp8/deshean/conus/rainier_rerun/mos_seasonal_summer-tile-0_ref.tif
+    #CONUS 8-m mos
+    #rpcdem=/nobackup/deshean/conus/dem2/conus_8m_tile_coreg_round3_summer2014-2016/conus_8m_tile_coreg_round3_summer2014-2016.vrt
+    #rpcdem=/nobackup/deshean/conus/dem2/oso_rerun/oso_blend_7px_mos-tile-0_filt5px_filt5px.tif
+    #rpcdem=/nobackupp8/deshean/hma/ngozumpa2/ngozumpa_8m_all-tile-0.tif
+    #Rainier rerun
+    #rpcdem=/nobackupp8/deshean/conus_combined/sites/rainier/stack_all/rainier_stack_all-tile-0_dzfilt_0.00-100.00_gaussfill-tile-0.tif
+    #rpcdem=/nobackupp8/deshean/hma/sites/khumbu/hma_20170716_mos_8m_warp_dzfilt_0.00-100.00_gaussfill-tile-0.tif
+    #rpcdem=/nobackupp8/deshean/hma/sites2/imja/stack_all/imja_stack_all-tile-0_dzfilt_0.00-200.00_fill.tif
+    #rpcdem=/nobackupp8/deshean/hma/sites2/thulagi/stack_all/thulagi_stack_all-tile-0_dzfilt_0.00-200.00_fill.tif
+    #rpcdem=/nobackupp8/deshean/hma/sites2/imja_barun_8m_mos_all-tile-0_warp_dzfilt_0.00-200.00_fill.tif
+    #rpcdem=/nobackup/deshean/hma/sites2/kathmandu/stack_all/kathmandu_stack_all-tile-0_dzfilt_0.00-200.00_fill.tif
+fi
+

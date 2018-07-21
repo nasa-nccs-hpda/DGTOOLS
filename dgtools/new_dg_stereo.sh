@@ -73,54 +73,15 @@ export NCPUS=$ncpu
 gdal_opt="-co TILED=YES -co COMPRESS=LZW -co BIGTIFF=YES" 
 gdal_opt+=" -co BLOCKXSIZE=256 -co BLOCKYSIZE=256"
 
-#Jako front+fjord_rock
-#xMin,yMin -193918.98,-2286653.95 : xMax,yMax -170473.04,-2255725.95
-#crop_extent="-193918.98 -2286653.95 -170473.04 -2255725.95"
-#Extended west to include IceBridge ATM track
-#xMin,yMin -195712.13,-2286712.83 : xMax,yMax -171650.72,-2255490.42
-#crop_extent="-195712.13 -2286712.83 -170650.72 -2256490.42"
-#Jak front test
-#crop_extent='-187699 -2281929 -176633 -2271308'
-#SCG, UTM 10N
-#crop_extent='641873 5355568 646107 5360478'
-#Rainier summer extent, UTM 10N
-#crop_extent='583240 5179200 608680 5202970'
-#Rainier sumit, UTM 10N
-#crop_extent='590580.0 5186456.0 598084.0 5193440.0'
-#Oso valley
-#AEA
-#'-521020 594667 -488443 623334'
-#UTM 10N
-#Oso Valley
-#crop_extent='572470 5339930 603070 53561410'
-#Oso slide
-#crop_extent='583990 5346290 587600 5349790'
-#Ngozumpa extent, UTM45N
-#crop_extent='464935 3085769 480079 3110324'
-#Rainier, UTM10N
-#crop_extent='583980.563675 5180108.83473 604964.563675 5201532.83473'
-#Khumbu, UTM45N
-#This is DEM extent, which is padded by 5 km 
-#crop_extent='471269.0 3083777.37813 498953.277372 3105492.0'
-#This is wgs shp extent
-#(476269.908031, 3088776.406966) - (493954.223316, 3100492.953012)
-#Do 3 km buffer to avoid ortho errors over extreme relief
-#crop_extent='473270 3085776 496954 3103492'
-#Imja, UTM45N
-#crop_extent='485298 3080203 499347 3093857'
-#Thulagi, UTM45N
-#crop_extent='249793 3150127 263194 3162171'
-#Barun, UTM45N
-#crop_extent='501320 3071264 516222 3081311'
-#Kathmandu, UTM45N
-#crop_extent='322103.222482 3050110.19871 352583.222482 3077822.19871'
-#crop_extent='322104 3050112 352582 3077820'
-
 #If input RPC DEM is specified, extract extent
 #Should intersect with image extents, common projection, find intersection
 if [ -n "$rpcdem" ] ; then
     crop_extent=$(get_extent.py $rpcdem)
 fi
+
+#Can hardcode crop extent here
+#Rainier, UTM10N
+#crop_extent='583980.563675 5180108.83473 604964.563675 5201532.83473'
 
 if [ -n "$crop_extent" ] ; then
     echo "User-defined crop extent: $crop_extent"
@@ -137,15 +98,14 @@ map=true
 #Bundle Adjustment for input images?
 bundle=false
 
-#Desired resolution in meters
-#res=1.0
-#res=0.5
+#Desired image GSD in meters
 #Should set res=0.0 for native fullres
 res="nat"
 #Alternative approach to specify reduce_percent
 #scale=50
-#ndv=-32768
+#Nodata values to use for image and DEM
 ndv=0
+dem_ndv=-9999
 
 #Output DRG?
 drg=false
@@ -156,8 +116,7 @@ error=false
 #Remove intermediate files, (PC, F)?
 rmfiles=false
 
-#Compress output?
-#Note: Pleiades compresses everything on Lou going to tape, turn off
+#Compress output gtiff?
 compress=false
 
 #Set up stereo command line options (no .stereo.default needed)
@@ -202,7 +161,7 @@ corrkernel=31
 #A good compromise between resolution and continuity
 #corrkernel=21
 rfnekernel=11
-#rfnekernel=11
+
 stereo_opt+=" --corr-kernel $corrkernel $corrkernel"
 stereo_opt+=" --subpixel-kernel $rfnekernel $rfnekernel"
 
@@ -241,11 +200,7 @@ max_lv=5
 stereo_opt+=" --corr-max-levels $max_lv"
 
 #Timeout for tile in seconds
-#timeout=360
 timeout=480
-#timeout=600
-#timeout=1200
-#timeout=1800
 stereo_opt+=" --corr-timeout $timeout"
 
 #Filtering mode
@@ -254,8 +209,6 @@ stereo_opt+=" --filter-mode 1"
 #Erosion in stereo_fltr
 #This is best setting to use for Antarctica
 erode_px=1024
-#erode_px=256
-#erode_px=32
 stereo_opt+=" --erode-max-size $erode_px"
 
 #stereo tri pc error filter
@@ -268,41 +221,10 @@ stereo_opt+=" --erode-max-size $erode_px"
 
 if [ -z "$rpcdem" ] ; then
     #For now, hardcode the rpcdem
-    rpcdir=/nobackup/deshean/rpcdem
-    #rpcdem=$rpcdir/bedmap2_surface_fill0_WGS84.tif
-    #rpcdem=$rpcdir/bedmap2_surface_fill0_WGS84_gauss1.tif
-    #rpcdem=$rpcdir/jhk_wv32m_blend100_combined_gimpdem_90m_mos_21px_feather_fltr_gauss9px_float32.tif
-    #rpcdem=$rpcdir/gimpdem_90m_gauss2_ndv0.tif
-    #rpcdem=$rpcdir/jakfront_20100709_smooth_16m_rpcdem_4x.tif
-    #rpcdem=$rpcdir/msh_dem_WGS84_fill_shpclip_embed_craterblend_gauss9s2_ds2x_gauss9s2.tif
-    #rpcdem=$rpcdir/rainierlidar_8x_wgs84.tif
-    #rpcdem=$rpcdir/NED_nw_10m_utm.tif
-    #rpcdem=$rpcdir/NED_nw_10m_utm_WGS84.tif
-
-    #rpcdem=$rpcdir/ned1/ned1_tiles_glac24k_115kmbuff.vrt
-
-    #rpcdem=$rpcdir/ned13/ned13_tiles_glac24k_115kmbuff.vrt
-    #rpcdem=$rpcdir/ned1_2003/ned1_2003_adj.vrt
-    #rpcdem=$rpcdir/gulkana_wolverine_ArcticDEM/gulkana_wolverine_ArcticDEM_8m.vrt
-    #rpcdem=$rpcdir/hma/srtm1/hma_srtm_gl1.vrt
-    #Fuego volcano
-    rpcdem=/nobackup/deshean/fuego/fuego_nasadem_hgt_merge_hgt_adj_proj.tif
-    #SCG merge
-    #rpcdem=/nobackupp8/deshean/conus/scg_rerun/scg_2012-2016_8m_trans_mos-tile-0.tif
-    #rpcdem=/nobackupp8/deshean/conus/scg_rerun/scg_2012-2016_8m_trans_mos_burn_2008-tile-0.tif
-    #Rainier noforest
-    #rpcdem=/nobackupp8/deshean/conus/rainier_rerun/mos_seasonal_summer-tile-0_ref.tif
-    #CONUS 8-m mos
-    #rpcdem=/nobackup/deshean/conus/dem2/conus_8m_tile_coreg_round3_summer2014-2016/conus_8m_tile_coreg_round3_summer2014-2016.vrt
-    #rpcdem=/nobackup/deshean/conus/dem2/oso_rerun/oso_blend_7px_mos-tile-0_filt5px_filt5px.tif
-    #rpcdem=/nobackupp8/deshean/hma/ngozumpa2/ngozumpa_8m_all-tile-0.tif
-    #Rainier rerun
-    #rpcdem=/nobackupp8/deshean/conus_combined/sites/rainier/stack_all/rainier_stack_all-tile-0_dzfilt_0.00-100.00_gaussfill-tile-0.tif
-    #rpcdem=/nobackupp8/deshean/hma/sites/khumbu/hma_20170716_mos_8m_warp_dzfilt_0.00-100.00_gaussfill-tile-0.tif
-    #rpcdem=/nobackupp8/deshean/hma/sites2/imja/stack_all/imja_stack_all-tile-0_dzfilt_0.00-200.00_fill.tif
-    #rpcdem=/nobackupp8/deshean/hma/sites2/thulagi/stack_all/thulagi_stack_all-tile-0_dzfilt_0.00-200.00_fill.tif
-    #rpcdem=/nobackupp8/deshean/hma/sites2/imja_barun_8m_mos_all-tile-0_warp_dzfilt_0.00-200.00_fill.tif
-    #rpcdem=/nobackup/deshean/hma/sites2/kathmandu/stack_all/kathmandu_stack_all-tile-0_dzfilt_0.00-200.00_fill.tif
+    #rpcdem=/nobackup/deshean/rpcdem/ned1/ned1_tiles_glac24k_115kmbuff.vrt
+    #rpcdem=/nobackup/deshean/rpcdem/ned13/ned13_tiles_glac24k_115kmbuff.vrt
+    #rpcdem=/nobackup/deshean/rpcdem/ned1_2003/ned1_2003_adj.vrt
+    rpcdem=/nobackup/deshean/rpcdem/hma/srtm1/hma_srtm_gl1.vrt
 fi
 
 #******************************************************************
@@ -384,15 +306,6 @@ else
     exit
 fi
 
-#Determine L and R based on resolution
-#Better to go through all xml files, find avg MEANPRODUCTGSD, but this works
-#Note: this has trouble with other xml files in the dir, like gdalinfo -stats .aux.xml
-#Note: can't use P1BS here when we use existing r100.xml files
-#res1=$(printf '%.3f' $(gettag $(ls *P1BS*${ids[0]}*.xml | grep -v 'aux.xml' | head -1) 'MEANPRODUCTGSD'))
-#res2=$(printf '%.3f' $(gettag $(ls *P1BS*${ids[1]}*.xml | grep -v 'aux.xml' | head -1) 'MEANPRODUCTGSD'))
-#res1=$(printf '%.3f' $(gettag $(ls *${ids[0]}*.xml | grep -v 'aux.xml' | head -1) 'MEANPRODUCTGSD'))
-#res2=$(printf '%.3f' $(gettag $(ls *${ids[1]}*.xml | grep -v 'aux.xml' | head -1) 'MEANPRODUCTGSD'))
-
 #This extracts mean GSD for the mosaiced products
 #Note: some older deliveries are missing MEANPRODUCT tags
 if grep -q MEANPRODUCTGSD ${ids[0]}.r100.xml ; then
@@ -427,13 +340,8 @@ else
     fi
 fi
 
-#Want to pull these from the <STEREO_PAIR> <ULLAT> tags - now written by dg_mosaic
-#Need to pull out info from original xml
-#xmlL1=$(ls *P1BS*${imgL}*.xml | grep -v 'aux.xml' | head -1)
-#xmlL1=$(ls *${imgL}*.xml | grep -v 'aux.xml' | head -1)
-xmlL1=${imgL}.r100.xml
-
 #Determine proj using proj_select utility and xml
+xmlL1=${imgL}.r100.xml
 proj="$(proj_select.py $xmlL1)"
 
 #Determine rpcdem
@@ -449,7 +357,6 @@ t=$(gettag $xmlL1 'FIRSTLINETIME')
 
 #This is a better estimate for center time of pair uses r100 firstline, numrows and linerate
 #Important for coincident stereo with time separation of hours or days
-#Kind of hacky to fit with existing formatting, but works
 ct=$(mono_cdate.py . | grep 'Center date:' | awk -F'date: ' '{print $NF}' | sed 's/ /T/')
 
 #SUSE date util is GNU, OS X is BSD
@@ -466,11 +373,6 @@ elif [ "$os" == "Darwin" ] ; then
     cts=$(date -j -f '%Y-%m-%dT%T' ${ct%.*} '+%Y%m%d_%H%M')
 fi
 
-#For reference, this is the single subscene tif generation
-#ntf2ortho.sh $i
-#gdal_translate $gdal_opt -scale 5 65535 1 65531 -a_nodata $ndv -stats -ot UInt16 -of GTiff $i ${i%.*}.tif
-
-#Split mosaic/ortho generation into functions, then call for L and R
 stereo_arg=""
 
 #Bundle Adjustment
@@ -505,7 +407,6 @@ if $map ; then
         outext="${outext}_${res}m"
     fi
     for id in $imgL $imgR; do
-        #This is a terrible hack
         echo
         if [ ! -e ${id}${outext}.xml ] ; then
             ln -sv ${id}.r100.xml ${id}${outext}.xml
@@ -533,11 +434,6 @@ if $map ; then
             eval time mapproject $map_opt $map_arg
         fi
     done
-    #if [ ! -e ${imgR}${outext}.tif ]; then
-        #Note: GDAL python is single-threaded - this step is slow for large images
-        #Now determine intersection up front from xml files with dg_stereo_int.py
-        #./lib/warplib.py ${imgL}${outext}.tif ${imgR}${outext}.tif
-    #fi
     stereo_arg+=" $rpcdem"
     stereo_opt+=" --alignment-method None"
 
@@ -549,7 +445,6 @@ if $map ; then
         echo
     fi
 
-#Don't map inputs, let ASP do the alignment
 else
     echo; date; echo;
     outext="_nomap"
@@ -560,9 +455,7 @@ else
     stereo_opt+=" --alignment-method AffineEpipolar"
 fi
 
-#Note: diverging from PGC naming scheme here
-#No need for WV02 tag, as IDs contains satellite number (WV01=102, WV02=103)
-#Want pair date and time in filename
+#Directory for output products
 outdir=dem${outext}
 #outdir=dem${outext}_${spm}_${corrkernel}_${rfnekernel}_${erode_px}
 
@@ -578,11 +471,9 @@ fi
 #Hack to replace existing timestamp
 out=$outdir/${ts}_${imgL}_${imgR}
 if [ "$ts" != "$cts" ] ; then
-    #if ls $out* 1> /dev/null 2>&1 ; then
     if [[ -n $(find . -name ${ts}_${imgL}_${imgR}*) ]] ; then
         echo "Found existing products with old timestamp format"
         echo "Updating timestamp from $ts to $cts"
-        #filelist=$(ls $out*)
         filelist=$(find . -name ${ts}_${imgL}_${imgR}*)
         for f in $filelist
         do
@@ -654,33 +545,13 @@ if [ "$e" -lt "5" ]; then
     #eval time parallel_stereo -e $e $pstereo_opt $stereo_opt $stereo_arg 
 fi
 
-#This should be done automatically by ASP now
-#Copy projection info from inputs to outputs, scaling appropriately
-#if $map ; then
-if false ; then
-    ext_list="L_sub R_sub D_sub D"
-    #Note: these should still be same dimensions as L.tif, even with --left-image-crop-win
-    #if [ -z "$window" ]; 
-        ext_list+=" RD F GoodPixelMap PC"
-    #fi
-    for ext in $ext_list
-    do
-        copyproj.py ${imgL}${outext}.tif ${out}-${ext}.tif
-    done
-fi
-
-#Compute correlation success
-#Note: NoData in GoodPixelMap is broken for AffineEpipolar
-#corrperc=$(asp_corrstats.py ${out}-GoodPixelMap.tif)
-#echo; echo "Correlation success: $corrperc %"; echo
-dem_ndv=-9999
 base_dem_opt+="--nodata-value $dem_ndv"
 base_dem_opt+=" --remove-outliers --remove-outliers-params 75.0 3.0"
-#base_dem_opt+=" --remove-outliers --remove-outliers-params 100.0 9999.0"
-#base_dem_opt+=" --max-valid-triangulation-error 8" 
+
 #Median filter, window size and dz threshold
 #base_dem_opt+=" --median-filter-params 11 40"
 #base_dem_opt+=" --search-radius-factor 1"
+
 #Rounding error precision - default is 1/1024, or ~1 mm
 #1/256
 #base_dem_opt+=" --rounding-error 0.00390625"
@@ -689,11 +560,8 @@ base_dem_opt+=" --remove-outliers --remove-outliers-params 75.0 3.0"
 #1/64
 #base_dem_opt+=" --rounding-error 0.015625"
 
-#Should limit to 2 threads on wes nodes - should avoid memory issues
-
 #Note: point2dem doesn't seem to use more than ~400% CPU
 if $parallel_point2dem ; then
-    #base_dem_opt+=" --threads 1"
     base_dem_opt+=" --threads 4"
     cmd_list=''
 else
@@ -701,9 +569,8 @@ else
 fi
 
 base_dem_opt+=" --t_srs \"$proj\""
-#Don't think this is actually necessary w/ proper PROJ4 string
-#base_dem_opt+=" -r earth"
 
+#Output multiple DEM resolutions
 for dem_res in 2 8 32
 do
     if [ ! -e ${out}-DEM_${dem_res}m.tif ]; then
@@ -724,20 +591,21 @@ do
             cmd+="time point2dem $dem_opt ${out}-PC.tif; "
             cmd+="mv ${out}_${dem_res}m-DEM.tif ${out}-DEM_${dem_res}m.tif; "
             #Absolute difference filter to remove outliers relative to rpcdem
-            if $map ; then
+            if [ -n "$rpcdem" ] ; then
                 cmd+="filter.py ${out}-DEM_${dem_res}m.tif -filt dz -param $rpcdem -200 200; "
             fi
+            #Shaded relief map
             #cmd+="gdaldem hillshade ${out}-DEM_${dem_res}m.tif ${out}-DEM_${dem_res}m_hs.tif"
             cmd_list+=\ \'$cmd\'
         else
             eval time point2dem $dem_opt ${out}-PC.tif
             mv ${out}_${dem_res}m-DEM.tif ${out}-DEM_${dem_res}m.tif
-            #gdaldem hillshade ${out}-DEM_${dem_res}m.tif ${out}-DEM_${dem_res}m_hs.tif
         fi
     fi
 done
 
 if $parallel_point2dem ; then
+    #For wes nodes, limit to 2 jobs to avoid memory issues
     if (( $NCPUS > 15 )) ; then
         njobs=3
     else
@@ -746,7 +614,7 @@ if $parallel_point2dem ; then
     eval parallel -verbose -j $njobs ::: $cmd_list
 fi
 
-#Full-res DEM output options
+#Full-res orthoimage output options
 dem_opt="$base_dem_opt"
 #We dont ever actually use the full-res DEM
 dem_opt+=" --no-dem"
@@ -770,7 +638,7 @@ if $drg ; then
         prefix=${out}_L
     fi
     dem_opt+=" -o $prefix"
-    #Create full-res DEM from PC
+    #Create full-res DRG from PC
     if [ ! -e ${prefix}-DRG.tif ]; then
         echo; date; echo;
         echo point2dem $dem_opt 
@@ -797,7 +665,6 @@ fi
 #mdenoise, or other DEM filtering
 
 echo "Generating 16-bit orthoimage from nadir ID"
-#ortho_proc.sh $dir 
 ortho_proc.sh .
 #rm ${imgL}${outext}.tif ${imgR}${outext}.tif ${imgL}${outext}.xml ${imgR}${outext}.xml 
 
